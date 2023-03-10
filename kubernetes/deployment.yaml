@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: healthchecks
+    namespace: healthchecks
+    labels:
+        app: healthchecks
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: healthchecks
+  template:
+    metadata:
+      labels:
+        app: healthchecks
+    spec:
+      containers:
+        - name: healthchecks
+          image: cloudyne/healthchecks:latest-proxyfix
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: http
+          envFrom:
+            - secretRef:
+                name: healthchecks-db-credentials
+            - configMapRef:
+                name: healthchecks-config
+        - name: healthchecks-proxy
+          image: bitnami/oauth2-proxy:latest
+          imagePullPolicy: Always
+          workingDir: /opt/bitnami/oauth2-proxy
+          command:
+            - "oauth2-proxy"
+            - "--upstream=http://localhost:8000"
+            - "--http-address=0.0.0.0:4180"
+          ports:
+            - containerPort: 4180
+              name: http
+          envFrom:
+            - configMapRef:
+                name: oauthproxy-config

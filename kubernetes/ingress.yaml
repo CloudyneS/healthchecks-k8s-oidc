@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: healthchecks
+  annotations:
+    nginx.ingress.kubernetes.io/enable-websockets: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - ping.domain.com
+  rules:
+    - host: ping.domain.com
+      http:
+        paths:
+          # Route everything to the proxy
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: healthchecks
+                port:
+                  number: 4180
+          
+          # To exclude the actual pings from the proxy, point the /ping prefix directly to healthchecks (unauthenticated)
+          - path: /ping
+            pathType: Prefix
+            backend:
+              service:
+                name: healthchecks
+                port:
+                  number: 8000

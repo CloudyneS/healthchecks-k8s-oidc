@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+    name: healthchecks
+spec:
+    type: ClusterIP
+    ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+    - port: 4180
+      targetPort: 4180
+      protocol: TCP
+      name: proxy
+    selector:
+      app: healthchecks
