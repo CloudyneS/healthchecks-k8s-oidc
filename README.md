@@ -11,7 +11,7 @@ Healthchecks supports the REMOTE_USER_HEADER parameter which is combined with Oa
 
 ## Usage
 ### The docker image
-Build the custom docker image, or retrieve it from cloudyne/healthchecks:latest-proxyfix. The only difference between this and the healthchecks/healthchecks image is a setting un uwsgi.ini extending the size of the proxy headers. This would probably work with the bitnami image out of the box.
+Build the custom docker image, or retrieve it from ghcr.io/cloudynes/healthchecks-proxyfix:latest or cloudyne/healthchecks-proxyfix:latest. The only difference between this and the healthchecks/healthchecks image is a setting un uwsgi.ini extending the size of the proxy headers. This would probably work with the bitnami image out of the box.
 
 ### Configuring Oauth2 Proxy
 Included are some example variables for configuring oauth2-proxy for Keycloak, more information can be found in the oauth2-proxy documentation.

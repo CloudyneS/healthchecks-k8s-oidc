@@ -33,6 +33,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/docker-ubuntu:latest
+            ghcr.io/cloudynes/healthchecks-proxyfix:latest
+            docker.io/cloudyne/healthchecks-proxyfix:latest
       
