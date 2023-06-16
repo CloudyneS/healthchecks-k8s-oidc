@@ -1,0 +1,132 @@
+<h1>How to Monitor Cron Jobs with SITE_NAME</h1>
+<p>SITE_NAME can monitor your cron jobs and notify you when they don't run at
+expected times. Assuming <code>curl</code> or <code>wget</code> is available, you will not need to install
+any new software on your servers.</p>
+<p>The principle of operation is simple: your cron job sends an HTTP request ("ping") to
+SITE_NAME every time it completes. When SITE_NAME does not receive the HTTP request
+at the expected time, it notifies you. This monitoring technique, sometimes called
+"heartbeat monitoring", is a type of <a href="https://en.wikipedia.org/wiki/Dead_man%27s_switch">dead man's switch</a>.
+It can detect various failure modes:</p>
+<ul>
+<li>The whole machine goes down (power outage, hardware failure, somebody trips on cables, etc.).</li>
+<li>The cron daemon is not running or has an invalid configuration.</li>
+<li>Cron does start your task, but the task exits with a non-zero exit code.</li>
+<li>The cron job runs for an abnormally long time.</li>
+</ul>
+<h2>Setting Up</h2>
+<p>Let's take a look at an example cron job:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># run backup.sh at 06:08 every day</span>
+<span class="m">8</span><span class="w"> </span><span class="m">6</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>/home/me/backup.sh
+</code></pre></div>
+
+<p>To monitor it, first create a new Check in your SITE_NAME account:</p>
+<p><img alt="The &quot;Add Check&quot; dialog" src="IMG_URL/add_check.png" /></p>
+<p>After creating the check, copy the generated <strong>ping URL</strong> , and update the job's
+definition:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># run backup.sh, then send a success signal to SITE_NAME</span>
+<span class="m">8</span><span class="w"> </span><span class="m">6</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>/home/me/backup.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>curl<span class="w"> </span>-fsS<span class="w"> </span>-m<span class="w"> </span><span class="m">10</span><span class="w"> </span>--retry<span class="w"> </span><span class="m">5</span><span class="w"> </span>-o<span class="w"> </span>/dev/null<span class="w"> </span>PING_URL
+</code></pre></div>
+
+<p>The extra curl call lets SITE_NAME know the cron job has run successfully.
+SITE_NAME keeps track of the received pings and notifies you as soon as a ping does
+not arrive on time.</p>
+<p>Note: you can alternatively add the extra <code>curl</code> call as a final line inside the
+<code>/home/me/backup.sh</code> script, to keep the cron job's definition clean and short.
+You can use an HTTP client other than curl to send the HTTP request.</p>
+<h2>Curl Options</h2>
+<p>The extra options in the above example tell curl to retry failed HTTP requests,
+limit the maximum execution time, and silence output unless there is an error.
+Feel free to adjust the curl options to suit your needs.</p>
+<dl>
+<dt><strong>&amp;&amp;</strong></dt>
+<dd>Run curl only if <code>/home/me/backup.sh</code> exits with an exit code 0.</dd>
+<dt><strong>-f, --fail</strong></dt>
+<dd>Makes curl treat non-200 responses as errors.</dd>
+<dt><strong>-s, --silent</strong></dt>
+<dd>Silent or quiet mode. Hides the progress meter, but also hides error messages.</dd>
+<dt><strong>-S, --show-error</strong></dt>
+<dd>Re-enables error messages when -s is used.</dd>
+<dt><strong>-m &lt;seconds&gt;</strong></dt>
+<dd>Maximum time in seconds that you allow the whole operation to take.</dd>
+<dt><strong>--retry &lt;num&gt;</strong></dt>
+<dd>If a transient error is returned when curl tries to perform a
+transfer, it will retry this number of times before  giving  up.
+Setting  the number to  0 makes curl do no retries (which is the default).
+A transient error is a timeout or an HTTP 5xx response code.</dd>
+<dt><strong>-o /dev/null</strong></dt>
+<dd>Redirect curl's stdout to /dev/null (error messages still go to stderr).</dd>
+</dl>
+<h2>Grace Time</h2>
+<p>Grace Time is the amount of extra time to wait when a cron job is running late
+before declaring it as down. Set Grace Time to be above the expected
+duration of your cron job.</p>
+<p>For example, let's say the cron job starts at 14:00 every day and takes
+between 15 and 25 minutes to complete. The grace time is set to 30 minutes.
+In this scenario, SITE_NAME will expect a ping to arrive at 14:00, but will not send
+any alerts yet. If there is no ping by 14:30, it will declare the job failed and
+send alerts.</p>
+<h2>Notifications</h2>
+<p>SITE_NAME has integrations to deliver notifications over different channels: email,
+webhooks, SMS, chat messages, incident management systems, and more. You can and should
+set up multiple ways to get notified about job failures:</p>
+<ul>
+<li><strong>Redundancy:</strong> if one notification channel fails (e.g., an email message gets
+delivered to spam), you will still receive notifications over the other channels.</li>
+<li><strong>Use different notification methods depending on job priority</strong>. You can set up
+notifications from low-priority jobs to email only, but notifications from
+high-priority jobs to email, SMS, and team chat.</li>
+</ul>
+<p>Additionally, to make sure no issues "slip through the cracks", in the
+<a href="../../accounts/profile/notifications/">Account Settings › Email Reports</a> page
+you can configure SITE_NAME to send repeated email notifications every hour or every
+day as long as any of the jobs is down:</p>
+<p><img alt="Email reminder options" src="IMG_URL/email_reports.png" /></p>
+<h2>Advanced Techniques</h2>
+<ul>
+<li>If your cron job hits an error, you can <a href="../signaling_failures/">actively signal it to SITE_NAME</a>.</li>
+<li>You can send a "start" signal at the start of the cron job, to <a href="../measuring_script_run_time/">track its run time</a>.</li>
+<li>You can <a href="../attaching_logs/">send stdout and stderr output</a> in the HTTP POST body.</li>
+</ul>
+<h2>What about MAILTO?</h2>
+<p>Classic cron implementations have a built-in method of notifying about cron job
+failures, the MAILTO variable:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">MAILTO</span><span class="o">=</span>email@example.org
+<span class="m">8</span><span class="w"> </span><span class="m">6</span><span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>*<span class="w"> </span>/home/me/backup.sh
+</code></pre></div>
+
+<p>So why not just use that? There are several drawbacks:</p>
+<ul>
+<li>For MAILTO to work, the server needs to have a configured MTA.</li>
+<li>You will not get notified if the whole machine is powered off, or has lost
+  network connection.</li>
+<li>If your cron job produces any stdout output, you will receive an
+  email every time the job runs. This may result in alert fatigue and you not
+  noticing errors between diagnostic messages.</li>
+</ul>
+<h2>Looking up Your Machine's Time Zone</h2>
+<p>If your cron job consistently pings SITE_NAME an hour early or an hour late,
+the likely cause is a timezone mismatch: your machine may be using a timezone
+different from what you have configured on SITE_NAME.</p>
+<p>On modern GNU/Linux systems, you can look up the time zone using the
+<code>timedatectl status</code> command and looking for "Time zone" in its output:</p>
+<div class="highlight"><pre><span></span><code>$ timedatectl status
+
+               Local time: C  2020-01-23 12:35:50 EET
+           Universal time: C  2020-01-23 10:35:50 UTC
+                 RTC time: C  2020-01-23 10:35:50
+<span class="hll">                Time zone: Europe/Riga (EET, +0200)
+</span>System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+</code></pre></div>
+
+<h2>Viewing Cron Logs Using <code>journalctl</code></h2>
+<p>On a systemd-based system, you can use the <code>journalctl</code> utility to see system logs,
+including logs from the cron daemon.</p>
+<p>To see live logs:</p>
+<div class="highlight"><pre><span></span><code>journalctl<span class="w"> </span>-f
+</code></pre></div>
+
+<p>To see the logs from e.g. the last hour, and only from the cron daemon:</p>
+<div class="highlight"><pre><span></span><code>journalctl<span class="w"> </span>--since<span class="w"> </span><span class="s2">&quot;1 hour ago&quot;</span><span class="w"> </span>-t<span class="w"> </span>CRON
+</code></pre></div>

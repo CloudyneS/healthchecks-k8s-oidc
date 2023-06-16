@@ -1,0 +1,599 @@
+<h1>Pinging API</h1>
+<p>With the Pinging API, you can signal <strong>success</strong>, <strong>start</strong>, and <strong>failure</strong> events from
+your systems.</p>
+<h2>General Notes</h2>
+<p>All ping endpoints support:</p>
+<ul>
+<li>HTTP and HTTPS</li>
+<li>HTTP 1.0, HTTP 1.1 and HTTP 2</li>
+<li>IPv4 and IPv6</li>
+<li>HEAD, GET, and POST request methods. For HTTP POST requests, clients can optionally
+include diagnostic information in the request body. If the request body looks like a
+UTF-8 string, SITE_NAME stores the request body (limited to the first
+PING_BODY_LIMIT_FORMATTED for each received ping).</li>
+</ul>
+<p>Successful responses will have the "200 OK" HTTP response status code and a short
+"OK" string in the response body.</p>
+<h2>UUIDs and Slugs</h2>
+<p>Each Pinging API request needs to uniquely identify a check.
+SITE_NAME supports two ways of identifying a check: by check's UUID,
+or by a combination of project's Ping Key and check's slug.</p>
+<p><strong>Check's UUID</strong> is automatically assigned when the check is created. It is
+immutable. You cannot replace the automatically assigned UUID with a manually
+chosen one. When you delete a check, you also lose its UUID and cannot get it back.</p>
+<p>You can look up UUIDs of your checks in web UI or via <a href="../api/">Management API</a> calls.</p>
+<p><strong>Check's slug</strong> can be chosen by the user. The slug should only contain the following
+characters: <code>a-z</code>, <code>0-9</code>, hyphens, underscores. A common practice is to
+derive the slug from the check's name (for example, a check named "Database Backup"
+might have a slug "database-backup"), but the user is free to pick arbitrary slug
+values.</p>
+<p>Check's slug <strong>can be changed</strong> by the user, from the web interface or by using
+<a href="../api/">Management API</a> calls.</p>
+<p>Check's slug is <strong>not guaranteed to be unique</strong>. If you make a Pinging API request
+using a non-unique slug, SITE_NAME will return the "409 Conflict" HTTP status code
+and ignore the request.</p>
+<h2>Endpoints</h2>
+<table>
+<thead>
+<tr>
+<th>Endpoint Name</th>
+<th>Endpoint Address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#success-uuid">Success (UUID)</a></td>
+<td><code>PING_ENDPOINT&lt;uuid&gt;</code></td>
+</tr>
+<tr>
+<td><a href="#start-uuid">Start (UUID)</a></td>
+<td><code>PING_ENDPOINT&lt;uuid&gt;/start</code></td>
+</tr>
+<tr>
+<td><a href="#fail-uuid">Failure (UUID)</a></td>
+<td><code>PING_ENDPOINT&lt;uuid&gt;/fail</code></td>
+</tr>
+<tr>
+<td><a href="#log-uuid">Log (UUID)</a></td>
+<td><code>PING_ENDPOINT&lt;uuid&gt;/log</code></td>
+</tr>
+<tr>
+<td><a href="#exitcode-uuid">Report script's exit status (UUID)</a></td>
+<td><code>PING_ENDPOINT&lt;uuid&gt;/&lt;exit-status&gt;</code></td>
+</tr>
+<tr>
+<td><a href="#success-slug">Success (slug)</a></td>
+<td><code>PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;</code></td>
+</tr>
+<tr>
+<td><a href="#start-slug">Start (slug)</a></td>
+<td><code>PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;/start</code></td>
+</tr>
+<tr>
+<td><a href="#fail-slug">Failure (slug)</a></td>
+<td><code>PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;/fail</code></td>
+</tr>
+<tr>
+<td><a href="#log-slug">Log (slug)</a></td>
+<td><code>PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;/log</code></td>
+</tr>
+<tr>
+<td><a href="#exitcode-slug">Report script's exit status (slug)</a></td>
+<td><code>PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;/&lt;exit-status&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<h2 class="rule" id="success-uuid">Send a "success" Signal Using UUID</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;uuid&gt;
+</code></pre></div>
+
+<p>Signals to SITE_NAME that the job has completed successfully (or,
+a continuously running process is still running and healthy).</p>
+<p>SITE_NAME identifies the check by the UUID value included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding start ping for this ping, and
+calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified UUID.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="start-uuid">Send a "start" Signal Using UUID</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;uuid&gt;/start
+</code></pre></div>
+
+<p>Sends a "job has started!" message to SITE_NAME. Sending a "start" signal is optional,
+but it enables a few extra features:</p>
+<ul>
+<li>SITE_NAME will measure and display job execution times</li>
+<li>SITE_NAME will detect if the job runs longer than its configured grace time</li>
+</ul>
+<p>SITE_NAME identifies the check by the UUID value included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding completion ping for this ping,
+and calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified UUID.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278/start</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="fail-uuid">Send a "failure" Signal Using UUID</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;uuid&gt;/fail
+</code></pre></div>
+
+<p>Signals to SITE_NAME that the job has failed. Actively signaling a failure
+minimizes the delay from your monitored service failing to you receiving an alert.</p>
+<p>SITE_NAME identifies the check by the UUID value included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding start ping for this ping, and
+calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified UUID.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278/fail</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="log-uuid">Send a "log" Signal Using UUID</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;uuid&gt;/log
+</code></pre></div>
+
+<p>Sends logging information to SITE_NAME without signaling success or failure.
+SITE_NAME will log the event and display it in check's "Events" section with the
+"Log" label. The check's status will not change.</p>
+<p>SITE_NAME identifies the check by the UUID value included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. The value must be a client-picked
+UUID in the canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified UUID.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278/log</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">11</span>
+
+Hello World
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="exitcode-uuid">Report Script's Exit Status (Using UUID)</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;uuid&gt;/&lt;exit-status&gt;
+</code></pre></div>
+
+<p>Sends a success or failure signal depending on the exit status
+included in the URL. The exit status is a 0-255 integer. SITE_NAME
+interprets 0 as a success and all other values as a failure.</p>
+<p>SITE_NAME identifies the check by the UUID value included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding start ping for this ping, and
+calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>400 invalid url format</dt>
+<dd>The URL does not match the expected format.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified UUID.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/5bf66975-d4c7-4bf5-bcc8-b8d8a82ea278/1</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="success-slug">Send a "success" Signal (Using Slug)</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;
+</code></pre></div>
+
+<p>Signals to SITE_NAME that the job has completed successfully (or,
+a continuously running process is still running and healthy).</p>
+<p>SITE_NAME identifies the check by project's ping key and check's slug
+included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding start ping for this ping, and
+calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified ping key and slug combination.</dd>
+<dt>409 ambiguous slug</dt>
+<dd>Ambiguous, the slug matched multiple checks.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/fqOOd6-F4MMNuCEnzTU01w/database-backup</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="start-slug">Send a "start" Signal (Using Slug)</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;/start
+</code></pre></div>
+
+<p>Sends a "job has started!" message to SITE_NAME. Sending a "start" signal is
+optional, but it enables a few extra features:</p>
+<ul>
+<li>SITE_NAME will measure and display job execution times</li>
+<li>SITE_NAME will detect if the job runs longer than its configured grace time</li>
+</ul>
+<p>SITE_NAME identifies the check by project's ping key and check's slug
+included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding completion ping for this ping,
+and calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified ping key and slug combination.</dd>
+<dt>409 ambiguous slug</dt>
+<dd>Ambiguous, the slug matched multiple checks.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/fqOOd6-F4MMNuCEnzTU01w/database-backup/start</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="fail-slug">Send a "failure" Signal (Using slug)</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;ping-key/&lt;slug&gt;/fail
+</code></pre></div>
+
+<p>Signals to SITE_NAME that the job has failed. Actively signaling a failure
+minimizes the delay from your monitored service failing to you receiving an alert.</p>
+<p>SITE_NAME identifies the check by project's ping key and check's slug
+included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding start ping for this ping, and
+calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified ping key and slug combination.</dd>
+<dt>409 ambiguous slug</dt>
+<dd>Ambiguous, the slug matched multiple checks.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/fqOOd6-F4MMNuCEnzTU01w/database-backup/fail</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="log-slug">Send a "log" Signal (Using slug)</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;ping-key/&lt;slug&gt;/log
+</code></pre></div>
+
+<p>Sends logging information to SITE_NAME without signaling success or failure.
+SITE_NAME will log the event and display it in check's "Events" section with the
+"Log" label. The check's status will not change.</p>
+<p>SITE_NAME identifies the check by project's ping key and check's slug
+included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. The value must be a client-picked UUID
+in the canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified ping key and slug combination.</dd>
+<dt>409 ambiguous slug</dt>
+<dd>Ambiguous, the slug matched multiple checks.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">POST</span> <span class="nn">/fqOOd6-F4MMNuCEnzTU01w/database-backup/log</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">11</span>
+
+Hello World
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>
+
+<h2 class="rule" id="exitcode-slug">Report Script's Exit Status (Using Slug)</h2>
+<div class="highlight"><pre><span></span><code>HEAD|GET|POST PING_ENDPOINT&lt;ping-key&gt;/&lt;slug&gt;/&lt;exit-status&gt;
+</code></pre></div>
+
+<p>Sends a success or failure signal depending on the exit status
+included in the URL. The exit status is a 0-255 integer. SITE_NAME
+interprets 0 as a success and all other values as a failure.</p>
+<p>SITE_NAME identifies the check by project's ping key and check's slug
+included in the URL.</p>
+<p>The response may optionally contain a <code>Ping-Body-Limit: &lt;n&gt;</code> response header.
+If this header is present, its value is an integer, and it specifies how many
+bytes from the request body SITE_NAME will store per request. For example, if n=100,
+but the client sends 123 bytes in the request body, SITE_NAME will store the first
+100 bytes, and ignore the remaining 23. The client can use this header to decide
+how much data to send in the request bodies of subsequent requests.</p>
+<h3>Query Parameters</h3>
+<dl>
+<dt>rid=&lt;uuid&gt;</dt>
+<dd>
+<p>Optional, specifies a run ID of this ping. If run ID is specified,
+SITE_NAME uses it to match the correct corresponding start ping for this ping, and
+calculate an accurate duration. The value must be a client-picked UUID in the
+canonical textual representation.</p>
+<p>Example: <code>rid=123e4567-e89b-12d3-a456-426614174000</code>.</p>
+</dd>
+</dl>
+<h3>Response Codes</h3>
+<dl>
+<dt>200 OK</dt>
+<dd>The request succeeded.</dd>
+<dt>400 invalid url format</dt>
+<dd>The URL does not match the expected format.</dd>
+<dt>404 not found</dt>
+<dd>Could not find a check with the specified ping key and slug combination.</dd>
+<dt>409 ambiguous slug</dt>
+<dd>Ambiguous, the slug matched multiple checks.</dd>
+</dl>
+<p><strong>Example</strong></p>
+<div class="highlight"><pre><span></span><code><span class="nf">GET</span> <span class="nn">/fqOOd6-F4MMNuCEnzTU01w/database-backup/1</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.0</span>
+<span class="na">Host</span><span class="o">:</span> <span class="l">hc-ping.com</span>
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code><span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span> <span class="m">200</span> <span class="ne">OK</span>
+<span class="na">Server</span><span class="o">:</span> <span class="l">nginx</span>
+<span class="na">Date</span><span class="o">:</span> <span class="l">Wed, 29 Jan 2020 09:58:23 GMT</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">text/plain; charset=utf-8</span>
+<span class="na">Content-Length</span><span class="o">:</span> <span class="l">2</span>
+<span class="na">Connection</span><span class="o">:</span> <span class="l">close</span>
+<span class="na">Access-Control-Allow-Origin</span><span class="o">:</span> <span class="l">*</span>
+<span class="na">Ping-Body-Limit</span><span class="o">:</span> <span class="l">PING_BODY_LIMIT</span>
+
+OK
+</code></pre></div>

@@ -1,0 +1,152 @@
+#details-head h1 {
+    margin-bottom: 4px;
+}
+
+#details-head {
+    margin-bottom: 24px;
+}
+
+#details-head h1 small {
+    font-size: 12px;
+}
+
+.details-block .status {
+    font-size: 32px;
+    width: 40px;
+}
+
+.details-block {
+    margin-bottom: 36px;
+}
+
+.details-block .copy-btn {
+    width: 90px;
+}
+
+.details-block code {
+    display: block;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: var(--pre-bg);
+}
+
+.details-block form {
+    display: inline;
+}
+
+#how-to-ping code {
+    overflow-wrap: break-word;
+}
+
+#details-schedule th {
+    padding-top: 4px;
+}
+
+#details-schedule td {
+    padding: 4px 0 4px 8px;
+}
+
+#details-schedule th {
+    vertical-align: top;
+    font-weight: normal;
+    text-align: right;
+}
+
+#details-schedule .value {
+    font-weight: bold;
+}
+
+#details-schedule .subtitle {
+    color: #999;
+}
+
+#details-integrations th {
+    width: 50px;
+    text-align: center;
+}
+
+#details-integrations .label {
+    background: #777777;
+}
+
+#details-integrations .on .label {
+    background: #22bc66;
+}
+
+#details-integrations.rw tr:hover th, #details-integrations.rw tr:hover td {
+    cursor: pointer;
+    background-color: var(--table-bg-hover);
+}
+
+#downtimes table {
+    max-width: 350px;
+}
+
+#downtimes tr:first-child td, #downtimes tr:first-child th {
+    border-top: 0;
+}
+
+#downtimes th {
+    width: 100px;
+    text-align: right;
+    font-weight: normal;
+    color: #888;
+}
+
+.alert.no-events, .alert.no-channels {
+    border: var(--alert-no-data-border);
+    background: var(--alert-no-data-bg);
+    color: var(--alert-no-data-color);
+    text-align: center;
+    padding: 32px;
+}
+
+ul.checkmarks {
+    padding-left: 20px;
+    list-style: none;
+    color: #117a3f;
+}
+
+ul.checkmarks li:before {
+    content: '✔ ';
+}
+
+
+ul.crosses {
+    padding-left: 20px;
+    list-style: none;
+    color: #aa413e;
+}
+
+ul.crosses li:before {
+    content: '✘ ';
+}
+
+@media (min-width: 992px) {
+    #filtering-rules-modal .modal-dialog {
+        width: 730px;
+    }
+}
+
+#filtering-rules-modal .modal-body {
+    padding: 24px;
+}
+
+#filtering-rules-modal h2 {
+    margin-top: 0;
+}
+
+
+#filtering-rules-modal hr {
+    margin: 0;
+}
+
+#current-status-indicator {
+    float: left;
+    width: 50px;
+    text-align: center;
+}
+#current-status-content {
+    margin-left: 50px;
+    padding-top: 6px;
+}

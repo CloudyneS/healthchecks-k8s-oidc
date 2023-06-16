@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+{% load hc_extras humanize %}
+
+<p>
+    "{{ check.name_then_code }}" is {{ check.status|upper }}.
+    <a href="{{ check.cloaked_url }}">View on {% site_name %}&hellip;</a>
+</p>
+
+
+{% if check.desc %}
+<p>
+    <b>Description</b><br>
+    {{ check.desc|linebreaksbr }}
+</p>
+{% endif %}
+
+{% cycle '' '</tr><tr>' as trtr silent %}
+<table>
+    <tr>
+        {% if check.project.name %}
+        <td style="padding-right: 32px; padding-bottom: 8px; vertical-align: top;">
+            <b>Project</b><br>
+            {{ check.project.name }}
+        </td>
+        {{ trtr|safe }} {% cycle trtr %}
+        {% endif %}
+
+        {% if check.tags_list %}
+        <td style="padding-right: 32px; padding-bottom: 8px; vertical-align: top;">
+            <b>Tags</b><br>
+            {% for tag in check.tags_list %}
+            <code style="background-color: #eeeeee; padding: 2px 4px; border-radius: 2px;">{{ tag }}</code>
+            {% endfor %}
+        </td>
+        {{ trtr|safe }} {% cycle trtr %}
+        {% endif %}
+
+        {% if check.kind == "simple" %}
+        <td style="padding-right: 32px; padding-bottom: 8px; vertical-align: top;">
+            <b>Period</b><br>
+            {{ check.timeout|hc_duration }}
+        </td>
+        {{ trtr|safe }} {% cycle trtr %}
+        {% endif %}
+
+        {% if check.kind == "cron" %}
+        <td style="padding-right: 32px; padding-bottom: 8px; vertical-align: top;">
+            <b>Schedule</b><br>
+            <code>{{ check.schedule }}</code>
+        </td>
+        {{ trtr|safe }} {% cycle trtr %}
+        {% endif %}
+
+        <td style="padding-right: 32px; padding-bottom: 8px; vertical-align: top;">
+            <b>Total Pings</b><br>
+            {{ check.n_pings }}
+            {% if check.created %}(since {{ check.created|date:'M j, Y' }}){% endif %}
+        </td>
+    </tr>
+
+    {% if ping %}
+    <tr>
+        <td style="padding-right: 32px; padding-bottom: 8px; vertical-align: top;">
+            <b>Last Ping</b><br>
+            {{ ping.created|naturaltime }}{% if ping.remote_addr %}, from {{ ping.remote_addr }}{% endif %}
+        </td>
+        <td style="padding-right: 32px; padding-bottom: 8px; vertical-align: top;">
+            <b>Last Ping Type</b><br>
+            {% if ping.kind == "ign" %}
+            <span style="background-color: #eeeeee; color: #333333; padding-left: 4px; padding-right: 4px; border-radius: 2px;">
+                Ignored
+            </span>
+            {% elif ping.exitstatus > 0 %}
+            <span style="background-color: #f2dede; color: #333333; padding-left: 4px; padding-right: 4px; border-radius: 2px;">
+                Exit status {{ ping.exitstatus }}
+            </span>
+            {% elif ping.exitstatus == 0 %}
+            <span style="background-color: #dff0d8; color: #333333; padding-left: 4px; padding-right: 4px; border-radius: 2px;">
+                Exit status 0
+            </span>
+            {% elif ping.kind == "fail" %}
+            <span style="background-color: #f2dede; color: #333333; padding-left: 4px; padding-right: 4px; border-radius: 2px;">
+                Failure
+            </span>
+            {% elif ping.kind == "start" %}
+            <span style="background-color: #dff0d8; color: #333333; padding-left: 4px; padding-right: 4px; border-radius: 2px;">
+                Started
+            </span>
+            {% elif ping.kind == "log" %}
+            <span style="background-color: #eeeeee; color: #333333; padding-left: 4px; padding-right: 4px; border-radius: 2px;">
+                Log
+            </span>
+            {% else %}
+            <span style="background-color: #dff0d8; color: #333333; padding-left: 4px; padding-right: 4px; border-radius: 2px;">
+                Success
+            </span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endif %}
+</table>
+
+{% if ping and ping.has_body %}
+<p><b>Last Ping Body</b></p>
+{% if body is None %}
+<p>
+    The request body data is being processed and will be available for viewing shortly.
+    Please <a href="{{ check.cloaked_url }}">view it on the website</a>.
+</p>
+{% else %}
+<pre style="font-family: monospace; line-height: 1em;">{{ body|slice:":10000"|linebreaksbr }}{% if body|length > 10000 %} [truncated]{% endif %}</pre>
+{% endif %}
+{% endif %}
+
+{% if projects %}
+<p><b>Projects Overview</b></p>
+<table>
+    {% for project in projects %}
+    <tr>
+        <td style="padding-right: 32px; padding-bottom: 4px;">
+            <a href="{{ project.checks_url }}">{{ project }}</a>
+        </td>
+        <td style="padding-right: 32px; padding-bottom: 4px;">
+            {% with project.get_n_down as n_down %}
+                {% if n_down %}
+                <b>{{ n_down }} check{{ n_down|pluralize }} down</b>
+                {% else %}
+                OK, all checks up
+                {% endif %}
+            {% endwith %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+<p style="color: #666666">
+&mdash;<br>
+{% site_name %}<br>
+<a href="{{ unsub_link }}" target="_blank" style="color: #666666; text-decoration: underline;">
+    {% if check.project.name %}
+    Unsubscribe from "{{ check.project.name }}" notifications
+    {% else %}
+    Unsubscribe
+    {% endif %}
+</a>
+</p>

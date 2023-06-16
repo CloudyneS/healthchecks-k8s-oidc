@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load compress hc_extras static %}
+
+{% block title %}Sign In - {{ site_name }}{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block head %}
+    <link rel="canonical" href="{% site_root %}{% url 'hc-login' %}" />
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-10 col-xs-offset-1 col-sm-12 col-sm-offset-0 col-lg-8 col-lg-offset-2">
+
+        <h1>Sign In to {{ site_name }}</h1>
+        {% if bad_link %}
+        <div class="alert alert-warning">
+            <p>The login link you just used is either incorrect or expired.</p>
+            <p>Please use the form below to request a fresh login link.</p>
+        </div>
+        {% endif %}
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form id="magic-link-form" method="post">
+                    {% csrf_token %}
+
+                    {% if magic_form.identity.errors %}
+                    <p class="text-danger">
+                        {% for e in magic_form.identity.errors %}{{ e }}{% endfor %}
+                    </p>
+                    {% else %}
+                    <p>Enter your <strong>email address</strong>.</p>
+                    {% endif %}
+
+                    <input
+                        type="email"
+                        class="form-control input-lg"
+                        name="identity"
+                        value="{{ magic_form.identity.value|default:"" }}"
+                        placeholder="you@example.org"
+                        autocomplete="email">
+
+                    <p id="link-instruction">
+                        We will email you a magic sign in link.
+                    </p>
+
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">
+                        Email Me a Link
+                    </button>
+                </form>
+                <div id="login-sep" class="hidden-xs"><div>or</div></div>
+            </div>
+
+            <div class="col-xs-12 visible-xs-block">
+                <div id="xs-login-sep">
+                    <div>or</div>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <form id="login-form" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="login" />
+
+                    {% if form.non_field_errors %}
+                        <p class="text-danger">{{ form.non_field_errors|join:"" }}</p>
+                    {% elif form.errors %}
+                        <p class="text-danger">Incorrect email or password.</p>
+                    {% else %}
+                    <p>
+                        Enter your <strong>email address</strong> and <strong>password</strong>.
+                    </p>
+                    {% endif %}
+
+                    <input
+                        type="email"
+                        class="form-control input-lg"
+                        name="email"
+                        value="{{ form.email.value|default:"" }}"
+                        placeholder="you@example.org"
+                        autocomplete="email">
+
+                    <input
+                        id="login-password"
+                        type="password"
+                        class="form-control input-lg"
+                        name="password"
+                        placeholder="your password">
+
+                    <p id="forgot-password">
+                        <a href="#" data-toggle="modal" data-target="#lost-password-modal">Lost your password?</a>
+                    </p>
+
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">
+                        Sign In
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if registration_open %}
+{% include "front/signup_modal.html" %}
+{% endif %}
+
+<div id="lost-password-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4>Lost Password?</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    If you need to reset your password, please do the following:
+                </p>
+                <ol>
+                    <li>Sign in using the <strong>Email Me a Link</strong> method.</li>
+                    <li>
+                        Once in your account, go to
+                        <strong>Account Settings › Set Password</strong>
+                        to set a new password.
+                    </li>
+                </ol>
+                {% if support_email %}
+                <p>
+                    Please contact us at
+                    <a href="mailto:{{ support_email }}">{{ support_email }}</a>
+                    in case you need assistance!
+                </p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Got it</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block base_scripts %}{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/bootstrap-native.min.js' %}"></script>
+<script src="{% static 'js/signup.js' %}"></script>
+{% endcompress %}
+{% endblock %}

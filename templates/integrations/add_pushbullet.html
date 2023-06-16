@@ -1,0 +1,30 @@
+{% extends "base_project.html" %}
+{% load humanize static hc_extras %}
+
+{% block title %}Pushbullet Integration for {{ site_name }}{% endblock %}
+
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+    <h1>Pushbullet</h1>
+
+    <div class="jumbotron">
+        <p>
+            With this integration, {{ site_name }} will send
+            a <a href="http://pushbullet.com/">Pushbullet</a>
+            notification when a check
+            goes <strong>up</strong> or <strong>down</strong>.
+        </p>
+
+        <form method="post" class="text-center">
+            {% csrf_token %}
+            <a href="{{ authorize_url }}" class="btn btn-lg btn-default">
+                <img class="ai-icon" src="{% static 'img/integrations/pushbullet.png' %}" alt="Pushbullet" />
+                Connect Pushbullet
+            </a>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

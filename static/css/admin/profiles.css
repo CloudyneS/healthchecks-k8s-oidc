@@ -1,0 +1,16 @@
+.field-projects ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.field-projects ul li {
+    list-style-type: none;
+}
+
+td.field-email span {
+    color: #555;
+    background: #EEE;
+    padding: 1px 4px;
+    border-radius: 2px;
+}

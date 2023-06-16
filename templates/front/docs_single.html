@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load compress hc_extras static %}
+
+{% block title %}{{ first_line|striptags }} - {{ site_name }}{% endblock %}
+{% block description %}{% endblock %}
+{% block keywords %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-3">
+
+    <div id="docs-search-form">
+        <input
+            id="docs-search"
+            type="text"
+            name="q"
+            class="form-control input-sm"
+            placeholder="Search docs&hellip;"
+            autocomplete="off">
+    </div>
+    <div id="search-results"></div>
+    <ul id="docs-nav" class="docs-nav">
+        <li class="nav-header">{{ site_name }}</li>
+        <li {% if section == "introduction" %} class="active"{% endif %}>
+            <a href="{% url 'hc-docs' %}">Introduction</a>
+        </li>
+        {% include "front/docs_nav_item.html" with slug="configuring_checks" title="Configuring checks" %}
+        {% include "front/docs_nav_item.html" with slug="configuring_notifications" title="Configuring notifications" %}
+        {% include "front/docs_nav_item.html" with slug="projects_teams" title="Projects and teams" %}
+        {% include "front/docs_nav_item.html" with slug="badges" title="Badges" %}
+
+        <li class="nav-header">API</li>
+        {% include "front/docs_nav_item.html" with slug="http_api" title="Pinging API" %}
+        {% include "front/docs_nav_item.html" with slug="api" title="Management API" %}
+
+        <li class="nav-header">Pinging Examples</li>
+        {% include "front/docs_nav_item.html" with slug="reliability_tips" title="Reliability Tips" %}
+        {% include "front/docs_nav_item.html" with slug="bash" title="Shell scripts" %}
+        {% include "front/docs_nav_item.html" with slug="arduino" title="Arduino" %}
+        {% include "front/docs_nav_item.html" with slug="csharp" title="C#" %}
+        {% include "front/docs_nav_item.html" with slug="email" title="Email" %}
+        {% include "front/docs_nav_item.html" with slug="github_actions" title="GitHub Actions" %}
+        {% include "front/docs_nav_item.html" with slug="go" title="Go" %}
+        {% include "front/docs_nav_item.html" with slug="javascript" title="Javascript" %}
+        {% include "front/docs_nav_item.html" with slug="php" title="PHP" %}
+        {% include "front/docs_nav_item.html" with slug="powershell" title="PowerShell" %}
+        {% include "front/docs_nav_item.html" with slug="python" title="Python" %}
+        {% include "front/docs_nav_item.html" with slug="ruby" title="Ruby" %}
+
+        <li class="nav-header">Guides</li>
+        {% include "front/docs_nav_item.html" with slug="monitoring_cron_jobs" title="Monitoring cron jobs" %}
+        {% include "front/docs_nav_item.html" with slug="signaling_failures" title="Signaling failures" %}
+        {% include "front/docs_nav_item.html" with slug="measuring_script_run_time" title="Measuring script run time" %}
+        {% include "front/docs_nav_item.html" with slug="attaching_logs" title="Attaching logs" %}
+        {% include "front/docs_nav_item.html" with slug="cloning_checks" title="Cloning checks" %}
+        {% include "front/docs_nav_item.html" with slug="configuring_prometheus" title="Configuring Prometheus" %}
+
+        <li class="nav-header">Developer Tools</li>
+        {% include "front/docs_nav_item.html" with slug="resources" title="Third-party resources" %}
+
+        <li class="nav-header">Self-hosted</li>
+        {% include "front/docs_nav_item.html" with slug="self_hosted" title="Overview" %}
+        {% include "front/docs_nav_item.html" with slug="self_hosted_configuration" title="Configuration" %}
+        {% include "front/docs_nav_item.html" with slug="self_hosted_docker" title="Running with Docker" %}
+
+        <li class="nav-header">Reference</li>
+        <li><a href="{% url 'hc-docs-cron' %}">Cron syntax cheatsheet</a></li>
+    </ul>
+
+    </div>
+    <div class="col-sm-9">
+        <div class="docs-content docs-{{ section }}">{{ content|safe }}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/snippet-copy.js' %}"></script>
+<script src="{% static 'js/search.js' %}"></script>
+{% endcompress %}
+{% endblock %}

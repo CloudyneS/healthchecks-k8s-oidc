@@ -1,0 +1,153 @@
+#checks-table {
+    margin-top: 36px;
+}
+
+#checks-table .checks-row:hover {
+    background-color: var(--table-bg-hover);
+}
+
+.my-checks-name.unnamed, #checks-table span.unavailable {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+#checks-table .indicator-cell {
+    text-align: center;
+    margin: 0 auto;
+}
+
+#checks-table th {
+    border-top: 0;
+}
+
+#checks-table a.default {
+    color: var(--text-color);
+}
+
+#checks-table tr:hover a.default {
+    color: var(--link-color);
+}
+
+#checks-table td {
+    vertical-align: middle;
+    border-top: 1px solid var(--border-muted);
+}
+
+#checks-table .my-checks-name,
+#checks-table .integrations,
+#checks-table .timeout-grace,
+#checks-table .last-ping {
+    border: 1px solid transparent;
+    padding: 6px;
+}
+
+#checks-table.rw tr:hover .my-checks-name,
+#checks-table.rw tr:hover .integrations,
+#checks-table.rw tr:hover .timeout-grace,
+#checks-table tr:hover .last-ping {
+    border: 1px dotted #AAA;
+    cursor: pointer;
+}
+
+#checks-table > tbody > tr > th.th-name,
+#checks-table > tbody > tr > th.th-integrations,
+#checks-table > tbody > tr > th.th-period,
+#checks-table > tbody > tr > th.th-last-ping {
+    padding-left: 15px;
+}
+
+#checks-table .integrations {
+    white-space: nowrap;
+}
+
+#checks-table .integrations span {
+    padding: 10px 2px;
+    display: inline-block;
+    font-size: 20px;
+    width: 24px;
+}
+
+#checks-table .integrations span.off:before {
+    color: var(--channel-off-inside-color);
+}
+
+#checks-table .integrations span.off:after {
+    color: var(--channel-off-color);
+}
+
+.timeout-grace .cron-expression {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 120px;
+}
+
+.checks-subline {
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* Name cell  */
+#checks-table td:nth-child(2) {
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* URL cell  */
+#checks-table td:nth-child(3) {
+    min-width: 420px;
+    max-width: 500px;
+}
+
+.my-checks-url {
+    font-family: "Lucida Console", Monaco, monospace;
+    font-size: 11.7px;
+    position: relative;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    padding: 4px 0; /* eliminate gaps between lines */
+}
+
+.my-checks-url .base {
+    color: var(--text-muted);
+}
+
+#checks-table .actions {
+    white-space: nowrap;
+}
+
+#checks-table td .btn {
+    border-color: transparent;
+    background-color: transparent;
+    font-size: 20px;
+    color: #999;
+}
+
+#checks-table tr:hover .btn {
+    color: #666;
+    background: transparent;
+    opacity: 1;
+}
+
+#checks-table tr:hover .btn:hover {
+    background: var(--btn-active-bg);
+    color: var(--btn-default-color);
+}
+
+#checks-table .pause {
+    opacity: 0;
+}
+
+#checks-table tr:hover .pause.confirm:hover {
+    background: #0091ea;
+    color: #FFF;
+    outline: none;
+}
+
+#url-style-switcher a {
+    color:  var(--text-muted);
+}
+
+#url-style-switcher a.active {
+    text-decoration:  underline;
+}

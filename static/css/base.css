@@ -1,0 +1,348 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 84px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 84px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-muted);
+}
+
+.footer ul {
+    list-style: none;
+    margin: 32px 0;
+    padding: 0;
+    font-size: small;
+}
+
+.footer li {
+    display: inline-block;
+    margin: 0 10px 0 0;
+}
+
+#logo {
+    max-height: 50px;
+    margin-top: -16px;
+}
+
+#nav-main-sections > li > a {
+    text-transform: uppercase;
+    font-size: small;
+}
+
+#project-menu {
+    padding: 0;
+}
+
+#project-menu > .dropdown > a {
+    display: block;
+    padding: 30px 15px;
+    font-size: 18px;
+    text-transform: none;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+#project-menu > .dropdown > a:hover {
+    padding-bottom: 25px;
+    border-bottom: 5px solid var(--border-muted);
+}
+
+#project-menu > .dropdown > a:hover,
+#project-menu > .dropdown > a:active,
+#project-menu > .dropdown > a:focus,
+#project-menu > .dropdown > a:target {
+    text-decoration: none;
+}
+
+#project-menu > .dropdown > .dropdown-menu {
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+
+#global-links > li > a {
+    font-size: small;
+}
+
+@media (min-width: 768px) {
+    .navbar-default .navbar-nav > li.active > a,
+    .navbar-default .navbar-nav > li > a:hover {
+        border-bottom: 5px solid var(--border-muted);
+        padding-bottom: 25px;
+    }
+}
+
+@media (max-width: 767px) {
+    .navbar-default .navbar-nav > li > a:hover {
+        border-left: 5px solid var(--border-color);
+        padding-left: 10px;
+    }
+
+    .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
+        border-left: 5px solid var(--border-color);
+        padding-left: 20px;
+    }
+}
+
+.navbar-default {
+    border-color: transparent;
+    border-bottom-color:  var(--border-muted);
+}
+
+.navbar-default .navbar-brand, .navbar-default .navbar-brand:hover {
+    font-weight: bold;
+}
+
+.navbar-collapse {
+    box-shadow: none;
+}
+
+#nav-sign-up {
+    padding: 21px 0 21px 15px;
+}
+
+#nav-sign-up:hover {
+    border: 0;
+}
+
+#nav-sign-up:focus, #nav-sign-up:active {
+    outline: none;
+}
+
+#nav-sign-up span {
+    display: inline-block;
+    color: #1ea65a;
+    font-weight: bold;
+    border: 1px solid #1ea65a;
+    border-radius: 5px;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+#nav-sign-up:hover span {
+    color: #fff;
+    background: #22bc66;
+    border-color: #22bc66;
+}
+
+#broken-channels > a {
+    color: hsl(1.2, 43.8%, 46.1%);
+}
+
+#broken-channels > a:hover {
+    color: hsl(1.2, 53.8%, 56.1%);
+}
+
+
+.page-checks .container-fluid, .page-details .container-fluid {
+    /* Fluid below 1320px, but max width capped to 1320px ... */
+    max-width: 1320px;
+}
+
+.status {
+    font-size: 24px;
+    display: inline-block;
+    width: 24px;
+}
+
+.status.ic-up, .status.ic-started { color: #5cb85c; }
+.status.ic-new, .status.ic-paused { color: var(--status-new-color); }
+.status.ic-grace { color: #f0ad4e; }
+.status.ic-down { color: #d9534f; }
+
+.label.label-start {
+    color: var(--label-start-color);
+    border: 1px solid #117a3f;
+}
+
+.label.label-ign,
+.label.label-log {
+    background: var(--label-ign-bg);
+    color: var(--label-ign-color);
+}
+
+.hc-dialog {
+    background-color: var(--panel-bg);
+    padding: 2em;
+    margin-top: 100px;
+}
+
+.hc-dialog h1 {
+    margin: 0;
+}
+
+.dialog-body {
+    margin: 24px 0;
+}
+
+pre {
+  border: 0;
+}
+
+.nav-pills > li > a {
+    color: var(--text-muted);
+}
+
+.jumbotron p {
+    font-weight: 300;
+}
+
+#debug-warning {
+    background: var(--debug-warning-bg);
+    text-align: center;
+    font-size: small;
+    padding: 2px 0;
+}
+
+#account-warning {
+    background: var(--account-warning-bg);
+    color: #000;
+    text-align: center;
+    padding: 8px 0;
+}
+
+#account-warning a {
+    color: #000;
+    text-decoration: underline;
+}
+
+.badge-down {
+    background-color: #d9534f;
+}
+
+.dropdown-menu > li.project-item a {
+    min-width: 200px;
+    padding-left: 12px;
+}
+
+.dropdown-menu > li.project-item a span.status {
+    transform: scale(0.7)
+}
+
+.dropdown-menu > li .btn-link {
+  display: block;
+  padding: 3px 20px;
+  color: var(--text-color);
+  white-space: nowrap;
+  width: 100%;
+  text-align: left;
+}
+
+.dropdown-menu > li .btn-link:focus,
+.dropdown-menu > li .btn-link:hover {
+    text-decoration: none;
+    background-color: var(--dropdown-link-hover-bg);
+}
+
+.project-item .name {
+    display: inline-block;
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spinner {
+    display: none;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    animation: spinner-pulse 1s infinite linear;
+    margin: 4px auto 0 auto;
+}
+
+.spinner.started {
+    display: block;
+}
+
+@keyframes spinner-pulse {
+    0%   {box-shadow: 8px 0 #aaaaaa99, -8px 0 #aaaaaa00; background: #aaaaaa4c }
+    15%  {box-shadow: 8px 0 #aaaaaa4c, -8px 0 #aaaaaa4c; background: #aaaaaa00 }
+    30%  {box-shadow: 8px 0 #aaaaaa00, -8px 0 #aaaaaa99; }
+    50%  {box-shadow: 8px 0 #aaaaaa66, -8px 0 #aaaaaaff; }
+    65%  {box-shadow: 8px 0 #aaaaaab2, -8px 0 #aaaaaab2; background: #aaaaaaff }
+    80%  {box-shadow: 8px 0 #aaaaaaff, -8px 0 #aaaaaa66; }
+    100% {box-shadow: 8px 0 #aaaaaa99, -8px 0 #aaaaaa00; background: #aaaaaa4c }
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus,
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+    outline: 0;
+}
+
+/* no button outlines in Chrome--  */
+
+.btn.focus,
+.btn:focus,
+.btn.active,
+.btn.active:focus,
+.btn:active.focus,
+.btn:active:focus {
+    outline: 0;
+}
+
+/* no up/down buttons for number fields */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.btn-remove {
+    border-color: #d43f3a;
+    color: var(--btn-remove-color);
+    background-color: var(--btn-remove-bg);
+}
+
+.btn-remove:hover,
+.btn-remove:focus {
+    background-color: var(--btn-remove-hover);
+    color: var(--btn-remove-color);
+}
+
+/* Greyed out help text in selectize dropdowns (e.g. in "Add ntfy" form) */
+.selectize-control .help {
+    opacity: 0.6;
+}
+
+/* Hide caret in single-select mode to mimic the standard <select> element  */
+.selectize-control.single {
+    caret-color: transparent;
+}
+
+.btn-default {
+    box-shadow: 0 5px 0 -3px rgba(0, 0, 0, 0.05);
+}
+
+.btn-remove,
+.btn-danger {
+    box-shadow: 0 5px 0 -3px rgba(212, 63, 58, 0.2);
+}
+
+.btn-primary {
+    box-shadow: 0 5px 0 -3px rgba(34, 188, 102, 0.3);
+}
+
+/* Fix select dropdown in Chrome and dark mode  */
+select.form-control {
+    background-color: var(--panel-bg);
+}

@@ -1,0 +1,37 @@
+{% extends "base_project.html" %}
+{% load compress humanize static hc_extras %}
+
+{% block title %}Trello Integration for {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+    <h1>Trello</h1>
+
+    <div class="jumbotron">
+        <p>
+            With this integration, {{ site_name }} will create a
+            <a href="https://trello.com/">Trello</a> card each
+            time a check goes down.
+        </p>
+
+        <div class="text-center">
+            {% csrf_token %}
+            <a href="{{ authorize_url }}" class="btn btn-lg btn-default">
+                <img class="ai-icon" src="{% static 'img/integrations/trello.png' %}" alt="Trello" />
+                Connect Trello
+            </a>
+        </div>
+    </div>
+
+    <div id="integration-settings"></div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/add_trello.js' %}"></script>
+{% endcompress %}
+{% endblock %}

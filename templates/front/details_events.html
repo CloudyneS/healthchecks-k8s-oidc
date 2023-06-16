@@ -1,0 +1,13 @@
+{% load hc_extras %}
+{% if events %}
+<table
+    class="table"
+    id="log"
+    data-url="{% url 'hc-ping-details' check.code '0' %}">{% for event in events %}{% include "front/log_row.html" %}{% endfor %}</table>
+<p class="text-center"><a href="{% url 'hc-log' check.code %}">Show More&hellip;</a></p>
+{% else %}
+    <div class="alert no-events">
+        You will see a <span class="hidden-xs">live-updating</span> log of received pings here. <br />
+        This check has not received any pings yet.
+    </div>
+{% endif %}

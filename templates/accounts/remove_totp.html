@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load compress static hc_extras %}
+
+{% block content %}
+<div class="row">
+<form class="col-sm-6 col-sm-offset-3" method="post">
+    {% csrf_token %}
+    <div class="panel panel-default">
+        <div class="panel-body settings-block">
+            <h2>Disable Authenticator App</h2>
+            <p></p>
+            <p>You are about to remove the authenticator app from your
+               {% site_name %} account.
+            </p>
+
+            {% if is_last %}
+            <p>
+                After removing the authenticator app,
+                <strong>two-factor authentication will no longer be active.</strong>
+            </p>
+            {% endif %}
+
+            <p>Are you sure you want to continue?</p>
+
+            <div class="text-right">
+                <a
+                    href="{% url 'hc-profile' %}"
+                    class="btn btn-default">Cancel</a>
+                <button
+                    type="submit"
+                    name="disable_totp"
+                    class="btn btn-danger">Disable Authenticator App</button>
+            </div>
+        </div>
+    </div>
+</form>
+</div>
+{% endblock %}

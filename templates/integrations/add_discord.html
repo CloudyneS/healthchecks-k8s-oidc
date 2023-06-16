@@ -1,0 +1,30 @@
+{% extends "base_project.html" %}
+{% load humanize static hc_extras %}
+
+{% block title %}Discord Integration for {{ site_name }}{% endblock %}
+
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+    <h1>Discord</h1>
+
+    <div class="jumbotron">
+        <p>
+            With this integration, {{ site_name }} will send
+            a notification to a <a href="http://discord.com/">Discord</a>
+            channel when a check
+            goes <strong>up</strong> or <strong>down</strong>.
+        </p>
+
+        <form method="post" class="text-center">
+            {% csrf_token %}
+            <a href="{{ authorize_url }}" class="btn btn-lg btn-default">
+                <img class="ai-icon" src="{% static 'img/integrations/discord.png' %}" alt="Discord" />
+                Connect Discord
+            </a>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

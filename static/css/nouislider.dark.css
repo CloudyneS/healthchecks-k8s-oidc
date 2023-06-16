@@ -1,0 +1,19 @@
+body.dark .noUi-target {
+    background-color: #3c3939;
+    border-color: #515151;
+    box-shadow: none;
+}
+
+body.dark .noUi-target.noUi-connect {
+    box-shadow: none;
+}
+
+body.dark .noUi-handle {
+    background-color: #515050;
+    border-color: #605c5c;
+    box-shadow: none;
+}
+
+body.dark .noUi-marker {
+    background: #777;
+}

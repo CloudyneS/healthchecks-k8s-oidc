@@ -1,0 +1,250 @@
+.channels-table {
+    margin-top: 36px;
+}
+
+
+.channel-row.kind-hipchat {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+.channels-table .channel-row > td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-muted);
+}
+
+.channels-table .icon-cell {
+    width: 40px;
+}
+
+.channels-table .icon-cell img {
+    margin-left: 16px;
+    height: 40px;
+}
+
+.channels-table .th-name,
+.channels-table .th-checks {
+    padding-left: 15px;
+}
+
+.channels-table .unnamed {
+    font-style: italic;
+    color: #999;
+}
+
+
+.channels-table .channel-row:hover > td {
+    background: var(--table-bg-hover);
+}
+
+table.channels-table > tbody > tr > th {
+    border-top: 0;
+}
+
+.edit-name, .edit-checks {
+    padding: 12px 6px;
+    border: 1px solid transparent;
+}
+
+.edit-name .channel-details-mini {
+    font-size: 11.7px;
+    color: #888;
+    max-width: 500px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.channel-details-mini span {
+    color: var(--small-text-color);
+}
+
+.rw .channel-row:hover .edit-name,
+.rw .channel-row:hover .edit-checks {
+    border: 1px dotted #AAA;
+    cursor: pointer;
+}
+
+.edit-checks {
+    color: var(--text-color);
+}
+
+.edit-checks:hover {
+    text-decoration: none;
+}
+
+.channel-row .actions {
+    text-align: right;
+    padding-right: 16px;
+}
+
+.channel-row .actions form {
+    display: inline;
+}
+
+.channel-row .actions .btn {
+    visibility: hidden;
+}
+
+.channel-row:hover .actions .btn {
+    visibility: visible;
+}
+
+.ai-title {
+    margin-top: 2em;
+}
+
+.add-integration {
+    list-style: none;
+    padding: 0;
+}
+
+.add-integration li {
+    position: relative;
+    padding: 8px 0;
+    border-radius: 4px;
+}
+
+.add-integration li:hover {
+    background: var(--table-bg-hover);
+}
+
+.add-integration .icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    margin-top: -20px;
+    width: 40px;
+    height: 40px;
+}
+
+.add-integration h2 {
+    font-size: 18px;
+    margin-left: 72px;
+}
+
+.add-integration p {
+    margin-left: 72px;
+}
+
+.add-integration a.btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    margin-top: -17px;
+    width: 139px;
+    height: 40px;
+    padding: 0;
+    line-height: 40px;
+}
+
+.btn img.ai-icon {
+   height: 1.4em;
+   margin-right: 2px;
+}
+
+.add-integration h2 {
+    margin-top: 0;
+}
+
+.setup-guide h2, .integration-settings h2 {
+    margin: 0 0 1em 0;
+}
+
+.ai-step {
+    margin: 2em 0;
+    counter-increment: ai-step;
+}
+
+.ai-step .step-no::after {
+    content: counter(ai-step);
+
+}
+
+.ai-step .step-no {
+    display: block;
+    float: left;
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    background: #0091ea;
+    border-radius: 32px;
+    text-align: center;
+    line-height: 48px;
+    margin-right: 32px;
+    margin-bottom: 32px;
+    color: #fff;
+    font-weight: 300;
+}
+
+.ai-step .marker-wrap {
+    position: relative;
+    clear: both;
+}
+
+.ai-step .marker {
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    margin-top: -10px;
+    background: #2abb66;
+    position: absolute;
+    border-radius: 10px;
+    opacity: 0;
+    animation: marker-ripple 1.2s ease-out infinite;
+}
+
+.ai-step p, .ai-step ul {
+    margin-left: 80px;
+}
+
+.ai-step ul {
+    padding-left: 20px;
+}
+
+@keyframes marker-ripple {
+  0%, 35% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(4);
+  }
+}
+
+.ai-guide-screenshot {
+    max-width: 100%;
+    border: 6px solid var(--border-color);
+}
+
+.add-integration li.link-to-github {
+    padding: 16px 0;
+}
+
+.link-to-github p {
+    margin-bottom: 0;
+}
+
+.page-channels .ic-delete {
+    font-size: 16px;
+}
+
+.channel-modal .modal-body {
+    padding: 15px 40px;
+}
+
+body.dark img.kind-mattermost,
+body.dark img.kind-matrix {
+    filter: invert();
+}
+
+img.kind-ntfy {
+    filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.2));
+}

@@ -1,0 +1,6 @@
+{% if nag %}
+    Reminder: {{ num_down }} check{{ num_down|pluralize }} still down
+{% else %}
+    {{ monthly_or_weekly|capfirst }} Report
+{% endif %}
+

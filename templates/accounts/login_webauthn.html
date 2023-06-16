@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load compress static hc_extras %}
+
+{% block content %}
+
+<div class="row">
+<form
+    id="login-tfa-form"
+    class="col-sm-6 col-sm-offset-3"
+    method="post"
+    encrypt="multipart/form-data">
+    <h1>Two-factor Authentication</h1>
+
+    <div id="pick-method">
+        {% if totp_url %}
+        <p>Please select how you want to authenticate.</p>
+        {% else %}
+        <p>
+            Please authenticate using your security key.<br />
+            When you are ready, press the button below.
+        </p>
+        {% endif %}
+
+        <button
+            id="use-key-btn"
+            type="button"
+            class="btn btn-primary">Use security key</button>
+        {% if totp_url %}
+        <a href="{{ totp_url }}" class="btn btn-default">
+            Use authenticator app
+        </a>
+        {% endif %}
+    </div>
+
+    {% csrf_token %}
+    <input id="response" type="hidden" name="response">
+
+    <div id="waiting" class="hide">
+        <h2>Waiting for security key</h2>
+        <p>
+            Follow your browser's steps to authenticate with your security key.
+        </p>
+
+        <div class="spinner started"></div>
+    </div>
+
+    <div id="error" class="alert alert-danger hide">
+        <p>
+            <strong>Something went wrong.</strong>
+        </p>
+        <p id="error-text"></p>
+
+        <div class="text-right">
+            <button id="retry" type="button" class="btn btn-danger">
+                Try Again
+            </button>
+        </div>
+    </div>
+
+    <div id="success" class="hide">
+        <div class="alert alert-success">
+            <strong>Success!</strong>
+            Credential acquired.
+        </div>
+    </div>
+</form>
+</div>
+
+{{ options|json_script:"options" }}
+
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/webauthn-json.browser-global.js' %}"></script>
+<script src="{% static 'js/login_tfa.js' %}"></script>
+{% endcompress %}
+{% endblock %}

@@ -1,0 +1,7 @@
+<ul>
+    {% for project in profile.user.project_set.all %}
+    <li>
+        <a href="{% url 'hc-checks' project.code %}">{{ project }}</a>
+    </li>
+    {% endfor %}
+</ul>

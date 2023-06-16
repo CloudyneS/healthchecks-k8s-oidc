@@ -1,0 +1,649 @@
+{% extends "base_project.html" %}
+{% load compress static hc_extras %}
+
+{% block title %}Project Settings - {{ project }}{% endblock %}
+
+
+{% block content %}
+{% with project.transfer_request as transfer_request %}
+<div class="row">
+    <div class="col-sm-9 col-md-6">
+        {% for message in messages %}
+            <p class="alert alert-{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+
+        {% if transfer_request and transfer_request.user == request.user %}
+        {% with can_accept=transfer_request.can_accept %}
+        <div id="transfer-request" class="panel">
+            <div class="panel-body settings-block">
+                <h2>Ownership Transfer Request</h2>
+                <p>
+                    <strong>{{ project.owner.email }}</strong> would like to transfer
+                    the ownership of this project to you.
+                </p>
+
+                {% if not can_accept %}
+                {% with num_checks=project.num_checks num_available=request.profile.num_checks_available %}
+                <p>
+                    This project has
+                    <strong>{{ num_checks }} check{{ num_checks|pluralize}}</strong>,
+                    but your account only has space for
+                    <strong>{{ num_available }} additional check{{ num_available|pluralize }}</strong>.
+                    To accept the transfer, please
+                    <a href="{% url 'hc-billing' %}">upgrade your account first!</a>
+                </p>
+                {% endwith%}
+                {% endif %}
+
+                <div class="pull-right">
+                    <form method="post">
+                        {% csrf_token %}
+                        <button
+                            type="submit"
+                            name="reject_transfer"
+                            class="btn btn-default">Reject</button>
+                        <button
+                            type="submit"
+                            name="accept_transfer"
+                            {% if not can_accept %}disabled{% endif %}
+                            class="btn btn-primary">Accept</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        {% endwith %}
+        {% endif %}
+
+        <div class="panel panel-{{ project_name_status|default:'default' }}">
+            <div class="panel-body settings-block">
+                <h2>Project Name</h2>
+                {{ project }}
+                {% if rw %}
+                <a
+                    href="#"
+                    class="btn btn-default pull-right"
+                    data-toggle="modal"
+                    data-target="#set-project-name-modal">Change Project Name</a>
+                {% endif %}
+            </div>
+
+           {% if project_name_updated %}
+            <div class="panel-footer">
+                Project name updated
+            </div>
+            {% endif %}
+        </div>
+
+        {% if rw %}
+        <div class="panel panel-{{ api_status|default:'default' }}">
+            <div class="panel-body settings-block">
+                <h2>API Access</h2>
+                <table id="api-keys" class="table">
+                    <tr>
+                        <td>API key</td>
+                        <td>
+                            {% if project.api_key %}
+                            {% if show_keys %}
+                                <code>{{ project.api_key }}</code>
+                            {% else %}
+                                <code>{{ project.api_key|mask_key }}</code>
+                            {% endif %}
+                            {% else %}
+                            <span class="not-set">not set</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if project.api_key %}
+                            <a href="#"
+                               data-revoke-key="api_key"
+                               data-name="API key">Revoke</a>
+                            {% else %}
+                            <a href="#" data-create-key="api_key">Create</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>API key (read-only)</td>
+                        <td>
+                            {% if project.api_key_readonly %}
+                            {% if show_keys %}
+                                <code>{{ project.api_key_readonly }}</code>
+                            {% else %}
+                                <code>{{ project.api_key_readonly|mask_key }}</code>
+                            {% endif %}
+                            {% else %}
+                            <span class="not-set">not set</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if project.api_key_readonly %}
+                            <a href="#"
+                               data-revoke-key="api_key_readonly"
+                               data-name="read-only API key">Revoke</a>
+                            {% else %}
+                            <a href="#" data-create-key="api_key_readonly">Create</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Ping key</td>
+                        <td>
+                            {% if project.ping_key %}
+                            {% if show_keys %}
+                                <code>{{ project.ping_key }}</code>
+                            {% else %}
+                                <code>{{ project.ping_key|mask_key }}</code>
+                            {% endif %}
+                            {% else %}
+                            <span class="not-set">not set</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if project.ping_key %}
+                            <a href="#"
+                               data-revoke-key="ping_key"
+                               data-name="Ping key">Revoke</a>
+                            {% else %}
+                            <a href="#" data-create-key="ping_key">Create</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+
+                <p>See also:</p>
+                <ul>
+                    <li><a href="{% url 'hc-serve-doc' 'api' %}">API documentation</a></li>
+                    {% if project.api_key_readonly and show_keys %}
+                    {% if enable_prometheus %}
+                    <li>
+                        <a href="{% url 'hc-metrics' project.code project.api_key_readonly %}">Prometheus metrics endpoint</a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ project.dashboard_url }}">Read-only dashboard</a>
+                        (<a href="https://github.com/healthchecks/dashboard/#security">security considerations</a>)
+                    </li>
+                    {% endif %}
+                </ul>
+
+                {% if not show_keys %}
+                {% if project.api_key or project.api_key_readonly or project.ping_key %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        name="show_keys"
+                        class="btn btn-default pull-right">Show Keys</button>
+                </form>
+                {% endif %}
+                {% endif %}
+            </div>
+
+            {% if key_created %}
+            <div class="panel-footer">
+                Key created
+            </div>
+            {% endif %}
+
+           {% if key_revoked %}
+            <div class="panel-footer">
+                Key revoked
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% with invite_suggestions=project.invite_suggestions %}
+        <div class="panel panel-{{ team_status|default:'default' }}">
+            <div class="panel-body settings-block">
+                <h2>Team Access</h2>
+                {% if memberships or invite_suggestions %}
+                    <table id="team-table" class="table">
+                        <tr>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td class="email">{{ project.owner.email }}</td>
+                            <td>Owner</td>
+                            <td></td>
+                        </tr>
+                        {% for m in memberships %}
+                        <tr>
+                            <td class="email">{{ m.user.email }}</td>
+                            <td>{{ m.get_role_display }}</td>
+                            <td>
+                                {% if is_manager and m.user != request.user %}
+                                <a
+                                    href="#"
+                                    data-email="{{ m.user.email }}"
+                                    class="pull-right member-remove">Remove</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                        {% if is_manager and invite_suggestions %}
+                        <tr id="suggestions-row">
+                            <td colspan="3">
+                                Add Users from Other Projects
+                            </td>
+                        </tr>
+
+                        {% for user in invite_suggestions %}
+                        <tr class="invite-suggestion">
+                            <td>{{ user.email }} </td>
+                            <td></td>
+                            <td>
+                                <a
+                                    href="#"
+                                    data-email="{{ user.email }}"
+                                    class="pull-right add-to-team">Add to Team</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% endif %}
+                    </table>
+                {% else %}
+                    <p>
+                        <strong>Invite team members to your project.</strong>
+                        Share access to your checks and configured integrations
+                        without having to share login details.
+                    </p>
+                {% endif %}
+
+                <br />
+
+                {% if is_manager %}
+                {% if can_invite_new_users %}
+                <a
+                    href="#"
+                    class="btn btn-primary pull-right"
+                    data-toggle="modal"
+                    data-target="#invite-team-member-modal">Invite a Team Member</a>
+                {% else %}
+                <div class="alert alert-info">
+                    <strong>Team size limit reached.</strong>
+                    {% if is_owner %}
+                    To invite new members by email, please
+                    <a href="{% url 'hc-pricing' %}">upgrade your account!</a>
+                    {% else %}
+                    To invite new members, please ask project's owner
+                    to upgrade their account.
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+            {% endwith %}
+
+           {% if team_member_invited %}
+            <div class="panel-footer">
+                {{ team_member_invited }} invited to team
+            </div>
+            {% endif %}
+
+           {% if team_member_duplicate %}
+            <div class="panel-footer">
+                {{ team_member_duplicate }} is already a member
+            </div>
+            {% endif %}
+
+           {% if team_member_removed %}
+            <div class="panel-footer">
+                {{ team_member_removed }} removed from team
+            </div>
+            {% endif %}
+        </div>
+
+        {% if is_owner %}
+        <div class="panel panel-{{ transfer_status|default:'default' }}">
+            <div class="panel-body settings-block">
+                <h2>Transfer Ownership</h2>
+
+                {% if transfer_request %}
+                <form method="post">
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        name="cancel_transfer"
+                        class="btn btn-default pull-right">Cancel Transfer</button>
+                </form>
+
+                Transfer initiated, awaiting confirmation from
+                <strong>{{ transfer_request.user.email }}</strong>.
+
+                {% else %}
+                <a href="#"
+                   class="btn btn-default pull-right"
+                   data-toggle="modal"
+                   data-target="#transfer-modal">Transfer Project&hellip;</a>
+                Transfer this project to a team member.
+                {% endif %}
+            </div>
+
+           {% if transfer_initiated %}
+            <div class="panel-footer">
+                Transfer initiated!
+            </div>
+            {% endif %}
+
+           {% if transfer_cancelled %}
+            <div class="panel-footer">
+                Transfer cancelled!
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if is_owner %}
+        <div class="panel panel-default">
+            <div class="panel-body settings-block">
+                    {% csrf_token %}
+                    <h2>Remove Project</h2>
+                    <a href="#"
+                       class="btn btn-remove pull-right"
+                       data-toggle="modal"
+                       data-target="#remove-project-modal">Remove Project</a>
+                    This will permanently remove project {{ project }}.
+                <form action="{% url 'hc-remove-project' project.code %}" method="post">
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% if rw %}
+<form id="create-key-form" method="post">
+    {% csrf_token %}
+    <input id="create-key-type" type="hidden" name="create_key">
+</form>
+{% endif %}
+
+{% if rw %}
+<div id="revoke-key-modal" class="modal">
+    <div class="modal-dialog">
+        <form id="revoke-key-form" method="post">
+            {% csrf_token %}
+            <input id="revoke-key-type" type="hidden" name="revoke_key">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4>Revoke <span class="name"></span>?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        You are about to revoke your current
+                        <span class="name"></span>.
+                    </p>
+                    <p>
+                        Afterwards, you can generate a new key, but there will
+                        be <strong>no way of getting the key's current value back</strong>.
+                    </p>
+                    <p>Are you sure?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        Revoke <span class="name"></span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if is_manager %}
+<div id="remove-team-member-modal" class="modal">
+    <div class="modal-dialog">
+        <form id="remove-team-member-form" method="post">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4>Remove Team Member</h4>
+                </div>
+                <div class="modal-body">
+                    <p>You are about to remove <strong id="rtm-email"></strong> from the project.</p>
+                    <p>Are you sure?</p>
+                    <input
+                        type="hidden"
+                        name="email"
+                        id="remove-team-member-email" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button
+                        type="submit"
+                        name="remove_team_member"
+                        class="btn btn-danger">Remove Member from Project</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if is_manager %}
+<div id="invite-team-member-modal" class="modal">
+    <div class="modal-dialog">
+        <form method="post" class="form-horizontal">
+            {% csrf_token %}
+            <input type="hidden" name="invite_team_member" value="1" />
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4>Invite a Team Member</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="itm-email" class="col-sm-3 control-label">Email</label>
+                        <div class="col-sm-8">
+                            {% if can_invite_new_users %}
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="itm-email"
+                                name="email"
+                                maxlength="254"
+                                placeholder="friend@example.org">
+                            {% else %}
+                            <p id="itm-email-display" class="form-control-static"></p>
+                            <input type="hidden" id="itm-email" name="email">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Access Level</label>
+
+                        <div class="col-sm-8">
+                        <label class="radio-container">
+                            <input
+                                type="radio"
+                                name="role"
+                                value="w"
+                                checked>
+                            <span class="radiomark"></span>
+                            Team Member
+                            <span class="help-block">
+                                Can create and manage checks and integrations.
+                                Cannot access your account's billing settings.
+                            </span>
+                        </label>
+                        <label class="radio-container">
+                            <input
+                                type="radio"
+                                name="role"
+                                value="m">
+                            <span class="radiomark"></span>
+                            Manager
+                            <span class="help-block">
+                                Same as Team Member, plus can invite and remove
+                                other members.
+                            </span>
+                        </label>
+                        <label class="radio-container">
+                            <input
+                                type="radio"
+                                name="role"
+                                value="r">
+                            <span class="radiomark"></span>
+                            Read-only
+                            <span class="help-block">
+                                Can view checks and integrations, but cannot
+                                modify anything. Cannot access project's API keys.
+                            </span>
+                        </label>
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button
+                        type="submit"
+                        name="invite_team_member"
+                        class="btn btn-primary">Send Invite</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if rw %}
+<div id="set-project-name-modal" class="modal">
+    <div class="modal-dialog">
+        <form method="post" class="form-horizontal">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4>Change Project Name</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="project-name" class="col-sm-4 control-label">Project Name</label>
+                        <div class="col-sm-7">
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="project-name"
+                                name="name"
+                                maxlength="60"
+                                value="{{ project }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button
+                        type="submit"
+                        name="set_project_name"
+                        class="btn btn-primary">Set Project Name</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if is_owner %}
+<div id="remove-project-modal" class="modal">
+    <div class="modal-dialog">
+        <form method="post" action="{% url 'hc-remove-project' project.code %}">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4>Remove "{{ project }}"?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Danger zone! You are about to permanently remove
+                    project <strong>{{ project }}</strong> and all
+                    of its associated checks and integrations. Are you sure?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button
+                        type="submit"
+                        class="btn btn-danger">Remove Project</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% if is_owner and not transfer_request %}
+<div id="transfer-modal" class="modal">
+    <div class="modal-dialog">
+    <form
+        class="form-horizontal"
+        method="post">
+        {% csrf_token %}
+        <input type="hidden" name="transfer_project" value="1" />
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4>Transfer Ownership</h4>
+            </div>
+            <div class="modal-body">
+
+                {% if memberships %}
+                <div class="form-group">
+                    <label for="new-owner" class="col-sm-4 control-label">
+                        Choose owner
+                    </label>
+                    <div class="col-sm-7">
+                        <select
+                            id="new-owner"
+                            name="email"
+                            title="Select..."
+                            class="form-control">
+                            <option></option>
+                            {% for m in memberships %}
+                            <option>{{ m.user.email }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                {% else %}
+                <p>
+                    This project currently has no team members.
+                    To transfer the ownership of this project, please start by
+                    inviting the new owner as a team member.
+                </p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button
+                    id="transfer-confirm"
+                    disabled
+                    type="submit"
+                    class="btn btn-primary">Initiate Transfer</button>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+{% endif %}
+
+{% endwith %}
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/project.js' %}"></script>
+{% endcompress %}
+{% endblock %}

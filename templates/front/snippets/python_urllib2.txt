@@ -1,0 +1,9 @@
+# Using Python 3 standard library:
+import socket
+import urllib.request
+
+try:
+    urllib.request.urlopen("PING_URL", timeout=10)
+except socket.error as e:
+    # Log ping failure here...
+    print("Ping failed: %s" % e)

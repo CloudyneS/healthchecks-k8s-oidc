@@ -1,0 +1,113 @@
+{% load hc_extras %}
+<div id="show-usage-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 id="usage-examples-title">
+                    {% if check.name %}"{{ check.name }}"{% endif %}
+                    Usage Examples
+                </h4>
+                <ul class="nav nav-pills" role="tablist">
+                    <li class="active">
+                        <a href="#crontab" data-toggle="tab">Crontab</a>
+                    </li>
+                    <li>
+                        <a href="#bash" data-toggle="tab">Bash</a>
+                    </li>
+                    <li>
+                        <a href="#python" data-toggle="tab">Python</a>
+                    </li>
+                    <li>
+                        <a href="#ruby" data-toggle="tab">Ruby</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="#node" data-toggle="tab">Node.js</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="#go" data-toggle="tab">Go</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="#php" data-toggle="tab">PHP</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="#cs" data-toggle="tab">C#</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="#browser" data-toggle="tab">Browser</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="#powershell" data-toggle="tab">PowerShell</a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="#email" data-toggle="tab">Email</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content">
+                    {% with ping_url=check.url %}
+                    <div role="tabpanel" class="tab-pane active" id="crontab">
+                        {% with check|guess_schedule as schedule %}
+                        <div class="highlight">
+                            <pre><span class="c1"># A sample crontab entry. Note the curl call appended after the command.</span>{% if not schedule %}
+<span class="c1"># FIXME: replace "* * * * *" below with the correct cron expression!</span>{% endif %}
+<span class="c1"># FIXME: replace "/your/command.sh" below with the correct command!</span>
+{{ schedule|default:"* * * * *" }} /your/command.sh && curl -fsS -m 10 --retry 5 -o /dev/null {{ ping_url }}</pre>
+                        </div>
+                        <div class="highlight">
+                            <pre><span class="c1"># Here's the part you need to append, provided here separately for easy copy/pasting:</span>
+&& curl -fsS -m 10 --retry 5 -o /dev/null {{ ping_url }}</pre>
+                        </div>
+                        {% endwith %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="bash">
+                        {% include "front/snippets/bash_curl.html" %}
+                        {% include "front/snippets/bash_wget.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="python">
+                        {% include "front/snippets/python_urllib2.html" %}
+                        {% include "front/snippets/python_requests.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="ruby">
+                        {% include "front/snippets/ruby.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="node">
+                        {% include "front/snippets/node.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="go">
+                        {% include "front/snippets/go.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="php">
+                        {% include "front/snippets/php.html" %}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="cs">
+                        {% include "front/snippets/cs.html" %}
+                    </div>
+                    <div class="tab-pane" id="browser">
+                        {% include "front/snippets/browser.html" %}
+                    </div>
+                    <div class="tab-pane" id="powershell">
+                        {% include "front/snippets/powershell.html" %}
+                        {% include "front/snippets/powershell_inline.html" %}
+                    </div>
+                    <div class="tab-pane" id="email">
+                        <p>
+                            Signal success or failure by sending an
+                            email message to <a href="mailto:{{ check.email }}">{{ check.email }}</a>.
+                        </p>
+                        <p>
+                            <a href="{% url 'hc-serve-doc' 'email' %}">Read more</a>
+                            about pinging via email.
+                        </p>
+                    </div>
+                    {% endwith %}
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Got It!</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load hc_extras %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+        <div class="hc-dialog">
+            <h1>Email Address Verified!</h1>
+            <div class="dialog-body">
+                <p>
+                    Success! You have verified this email
+                    address, and it will now receive
+                    {{ site_name }} notifications.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

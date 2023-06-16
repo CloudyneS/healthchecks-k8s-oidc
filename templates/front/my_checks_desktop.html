@@ -1,0 +1,144 @@
+{% load hc_extras static %}
+<table
+    id="checks-table"
+    class="table {% if rw %}rw{% endif%}"
+    data-status-url="{% url 'hc-status' project.code %}">
+    <tr>
+        <th></th>
+        <th class="th-name">
+            {% if sort == "name" %}
+            <a href="{% sort_url '-name' %}" data-toggle="tooltip" class="sort-name" data-sort-value="-name">
+                Name<span class="ic-asc"></span>
+            </a>
+            {% elif sort == "-name" %}
+            <a href="{% sort_url 'created' %}" data-toggle="tooltip" class="sort-name" data-sort-value="created">
+                Name<span class="ic-desc"></span>
+            </a>
+            {% else %}
+            <a href="{% sort_url 'name' %}" data-toggle="tooltip" class="default sort-name" data-sort-value="name">
+                Name
+            </a>
+            {% endif %}
+        </th>
+        <th class="hidden-xs hidden-sm hidden-md">
+            <span class="visible-lg-inline">
+                Ping URL
+            </span>
+            <span class="visible-md-inline">{{ project.show_slugs|yesno:"Key/Slug,UUID" }}</span>
+            {% if rw %}
+            <small id="url-style-switcher">
+                <a href="?urls=uuid" {% if not project.show_slugs %}class="active"{% endif %}>uuid</a>
+                <a href="?urls=slug" {% if project.show_slugs %}class="active"{% endif %}>slug</a>
+            </small>
+            {% endif %}
+        </th>
+        <th class="th-integrations hidden-xs">Integrations</th>
+        <th class="th-period hidden-xs">
+            Period <br />
+            <span class="checks-subline">Grace</span>
+        </th>
+        <th class="th-last-ping hidden-xs">
+            {% if sort == "last_ping" %}
+            <a href="{% sort_url '-last_ping' %}" data-toggle="tooltip" class="sort-last-ping" data-sort-value="-last_ping">
+                Last Ping<span class="ic-asc"></span>
+            </a>
+            {% elif sort == "-last_ping" %}
+            <a href="{% sort_url 'created' %}" data-toggle="tooltip" class="sort-last-ping" data-sort-value="created">
+                Last Ping<span class="ic-desc"></span>
+            </a>
+            {% else %}
+            <a href="{% sort_url 'last_ping' %}" data-toggle="tooltip" class="default sort-last-ping" data-sort-value="last_ping">
+                Last Ping
+            </a>
+            {% endif %}
+            {% if show_last_duration %}
+            <br />
+            <span class="checks-subline">Last Duration</span>
+            {% endif %}
+        </th>
+        <th></th>
+    </tr>
+    {% for check in checks %}
+    <tr id="{{ check.code }}" class="checks-row" {% if check in hidden_checks %}style="display: none"{% endif %}>
+        <td class="indicator-cell">
+            <span class="status ic-{{ check.get_status }}" data-toggle="tooltip"></span>
+            <div class="spinner {% if check.last_start %}started{% endif %}"></div>
+        </td>
+        <td>
+            <div data-name="{{ check.name }}"
+                 data-slug="{{ check.slug }}"
+                 data-tags="{{ check.tags }}"
+                 data-desc="{{ check.desc }}"
+                 class="my-checks-name {% if not check.name %}unnamed{% endif %}">
+                <div>{{ check.name|default:"unnamed"|break_underscore }}</div>
+                {% for tag in check.tags_list %}
+                <span class="label label-tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+        </td>
+        <td class="hidden-xs hidden-sm hidden-md">
+            {% if project.show_slugs and not check.slug %}
+                <span class="unavailable">unavailable, slug not set</span>
+            {% else %}
+                <span class="my-checks-url">{{ check.url|format_ping_endpoint }}</span>
+                {% if project.show_slugs and check.slug in ambiguous %}
+                <small class="text-danger">(not unique)</small>
+                {% endif %}
+            {% endif %}
+        </td>
+        <td class="hidden-xs">
+            {% if channels|length <= 10 %}
+                <div class="integrations">
+                {% spaceless %}
+                {% for channel in channels %}
+                    <span class="ic-{{ channel.kind }}{% if channel in check.channel_set.all %}{% else %} off{% endif %}"></span>
+                {% endfor %}
+                {% endspaceless %}
+                </div>
+            {% else %}
+                {{ check.channel_set.all|length }} of {{ channels|length }}
+            {% endif %}
+        </td>
+        <td class="hidden-xs">
+            <div class="timeout-grace"
+                data-kind="{{ check.kind }}"
+                data-timeout="{{ check.timeout.total_seconds|floatformat:'0' }}"
+                data-grace="{{ check.grace.total_seconds|floatformat:'0' }}"
+                data-schedule="{{ check.schedule }}"
+                data-tz="{{ check.tz }}">
+                {% if check.kind == "simple" %}
+                    {{ check.timeout|hc_duration }}
+                    <br />
+                {% elif check.kind == "cron" %}
+                    <div class="cron-expression">{{ check.schedule }}</div>
+                {% endif %}
+                <span class="checks-subline">
+                {{ check.grace|hc_duration }}
+                </span>
+            </div>
+        </td>
+        <td class="hidden-xs">
+            <div class="last-ping">{% include "front/last_ping_cell.html" with check=check %}</div>
+        </td>
+        <td class="actions">
+            {% if rw %}
+            <button class="btn pause" type="button">
+                <span class="ic-paused"></span>
+            </button>
+            {% endif %}
+            <button title="Show Details" class="btn show-log" type="button">
+                <span class="ic-dots"></span>
+            </button>
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% for channel in channels %}
+<div
+    id="ch-{{ forloop.counter0}}"
+    data-code="{{ channel.code }}"
+    data-title="{{ channel }}">
+</div>
+{% endfor %}

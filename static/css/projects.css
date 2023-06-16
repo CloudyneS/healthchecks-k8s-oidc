@@ -1,0 +1,48 @@
+#project-selector a {
+    color: var(--text-color);
+}
+
+#project-selector a:hover {
+    text-decoration: none;
+}
+
+#project-selector a:hover .project,
+#project-selector .project.selected {
+    border-color: var(--link-color);
+}
+
+#project-selector .project {
+    border-color: var(--border-color);
+    padding: 24px 24px 24px 64px;
+    position: relative;
+    min-height: 120px;
+}
+
+#project-selector .project h4 {
+    font-weight: bold;
+    margin-top: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#project-selector #add-project .project {
+    border-style: dashed;
+    padding: 0;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #999;
+    line-height: 120px;
+}
+
+#project-selector #add-project:hover .project {
+    border-color: var(--link-color);
+    color: var(--text-color);
+}
+
+.indicators {
+    position: absolute;
+    left: 24px;
+    width:  24px;
+}

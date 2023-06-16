@@ -1,0 +1,60 @@
+<h1>Running with Docker</h1>
+<p>In the Healthchecks source code, <a href="https://github.com/healthchecks/healthchecks/tree/master/docker">/docker/ directory</a>,
+you can find a sample configuration for running the project with
+<a href="https://www.docker.com">Docker</a> and <a href="https://docs.docker.com/compose/">Docker Compose</a>.</p>
+<p>Note: For the sake of simplicity, the sample configuration starts a single database
+node and a single web server node, both on the same host. It does not handle TLS
+termination.</p>
+<h2>Getting Started</h2>
+<ul>
+<li>Grab the Healthchecks source code
+  <a href="https://github.com/healthchecks/healthchecks">from the GitHub repository</a>.</li>
+<li>Copy <code>docker/.env.example</code> to <code>docker/.env</code> and add your configuration in it.
+  As a minimum, set the following fields:<ul>
+<li><code>DEFAULT_FROM_EMAIL</code> – the "From:" address for outbound emails</li>
+<li><code>EMAIL_HOST</code> – the SMTP server</li>
+<li><code>EMAIL_HOST_PASSWORD</code> – the SMTP password</li>
+<li><code>EMAIL_HOST_USER</code> – the SMTP username</li>
+<li><code>SECRET_KEY</code> – secures HTTP sessions, set to a random value</li>
+</ul>
+</li>
+<li>
+<p>Create and start containers:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>docker
+$<span class="w"> </span>docker-compose<span class="w"> </span>up
+</code></pre></div>
+
+</li>
+<li>
+<p>Create a superuser:</p>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>docker-compose<span class="w"> </span>run<span class="w"> </span>web<span class="w"> </span>/opt/healthchecks/manage.py<span class="w"> </span>createsuperuser
+</code></pre></div>
+
+</li>
+<li>
+<p>Open <a href="http://localhost:8000">http://localhost:8000</a> in your browser and log in with
+  the credentials from the previous step.</p>
+</li>
+</ul>
+<h2>uWSGI Configuration</h2>
+<p>The reference Dockerfile uses <a href="https://uwsgi-docs.readthedocs.io/en/latest/">uWSGI</a>
+as the WSGI server. You can configure uWSGI by setting <code>UWSGI_...</code> environment
+variables in <code>docker/.env</code>. For example, to disable HTTP request logging, set:</p>
+<div class="highlight"><pre><span></span><code>UWSGI_DISABLE_LOGGING=1
+</code></pre></div>
+
+<p>Read more about configuring uWSGI in <a href="https://uwsgi-docs.readthedocs.io/en/latest/Configuration.html#environment-variables">uWSGI documentation</a>.</p>
+<h2>TLS Termination</h2>
+<p>If you plan to expose your Healthchecks instance to the public internet, make sure you
+put a TLS-terminating reverse proxy in front of it.</p>
+<p><strong>Important:</strong> This Dockerfile uses UWSGI, which relies on the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-Proto">X-Forwarded-Proto</a>
+header to determine if a request is secure or not. Make sure your TLS-terminating
+reverse proxy:</p>
+<ul>
+<li>Discards the X-Forwarded-Proto header sent by the end user.</li>
+<li>Sets the X-Forwarded-Proto header value to match the protocol of the original request
+  ("http" or "https").</li>
+</ul>
+<p>For example, in NGINX you can use the <code>$scheme</code> variable like so:</p>
+<div class="highlight"><pre><span></span><code>proxy_set_header X-Forwarded-Proto $scheme;
+</code></pre></div>

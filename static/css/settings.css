@@ -1,0 +1,49 @@
+.settings-title {
+    padding-bottom: 24px;
+}
+
+.settings-block {
+    padding: 24px;
+}
+
+.settings-block h2 {
+    margin: 0;
+    padding-bottom: 24px;
+}
+
+.page-project .ic-ok {
+    color: #5cb85c;
+}
+
+.invite-suggestion {
+    color: var(--text-muted);
+}
+
+#suggestions-row td {
+    border-top: 0;
+    font-size: 85%;
+    padding-top: 20px;
+}
+
+#team-table th {
+    border-top: 0;
+}
+
+#team-table .email {
+    max-width: 340px;
+    word-wrap: break-word;
+
+}
+
+.page-project .panel-footer {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+#transfer-request {
+    border: 5px solid #ffdc3e;
+}
+
+#transfer-request .settings-block {
+    padding: 20px;
+}

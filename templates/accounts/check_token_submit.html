@@ -1,0 +1,52 @@
+{% load hc_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Continue to {{ site_name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<style>
+    body {
+        font-family: Arial;
+        text-align: center;
+        margin: 10em;
+    }
+
+    input {
+        display: inline-block;
+        margin-bottom: 0;
+        font-weight: normal;
+        text-align: center;
+        vertical-align: middle;
+        touch-action: manipulation;
+        cursor: pointer;
+        background-image: none;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        padding: 10px 16px;
+        font-size: 18px;
+        line-height: 1.3333333;
+        border-radius: 6px;
+        color: #ffffff;
+        background-color: #22bc66;
+        border-color: #1ea65a;
+    }
+</style>
+
+<p>You are about to log into {{ site_name }}.</p>
+<p>Please press the button below to continue:</p>
+<br />
+<form method="post">
+    {% csrf_token %}
+    <input
+        id="submit-btn"
+        type="submit"
+        class="btn btn-lg btn-primary"
+        value="Continue to {{ site_name }}">
+</form>
+
+</body>
+</html>

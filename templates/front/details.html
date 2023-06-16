@@ -1,0 +1,368 @@
+{% extends "base_project.html" %}
+{% load compress humanize static hc_extras %}
+
+{% block title %}{{ check|down_title }}{% endblock %}
+
+
+{% block content %}
+
+<div class="row">
+    {% if is_copied %}
+    <div class="col-sm-12">
+        <p id="new-check-alert" class="alert alert-success">
+            <strong>Copy created!</strong>
+            This is a brand new check, with details copied over from your existing check.
+            You might now want to
+            <a data-target="edit-name" href="#">update its name and tags</a>.
+        </p>
+    </div>
+    {% endif %}
+
+    {% if messages %}
+    <div class="col-sm-12">
+        {% for message in messages %}
+            <p class="alert alert-{{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div id="details-head" class="col-sm-12">
+        <h1>
+            {{ check.name_then_code }}
+            {% if rw %}
+            <small><a id="edit-name" href="#">(edit&hellip;)</a></small>
+            {% endif %}
+        </h1>
+        {% for tag in check.tags_list %}
+            <span class="label label-tag">{{ tag }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="col-sm-5">
+        {% if rw %}
+        <div class="details-block">
+            <h2>Description</h2>
+            {% if check.desc %}
+            {{ check.desc|linebreaks|urlize }}
+            <div class="text-right">
+                <button id="edit-desc" class="btn btn-sm btn-default">
+                    Edit Description&hellip;
+                </button>
+            </div>
+            {% else %}
+            <small><a id="edit-desc" href="#">Add description&hellip;</a></small>
+            {% endif %}
+        </div>
+        {% elif check.desc %}
+        <div class="details-block">
+            <h2>Description</h2>
+            {{ check.desc|linebreaks|urlize }}
+        </div>
+        {% endif %}
+
+        <div id="how-to-ping" class="details-block">
+            <h2>
+                How To Ping
+                {% if rw %}
+                    <div class="btn-group pull-right">
+                        <a href="?urls=uuid" class="btn btn-default btn-xs {% if not project.show_slugs %}active{% endif %}">uuid</a>
+                        <a href="?urls=slug" class="btn btn-default btn-xs {% if project.show_slugs %}active{% endif %}">slug</a>
+                </div>
+                {% endif %}
+            </h2>
+            <div>
+                <p>
+                    Keep this check up by making HTTP
+                    {% if check.methods == "POST" %}POST{% endif %}
+                    requests to this URL:
+                </p>
+                {% if check.url %}
+                <code>{{ check.url }}</code>
+                {% else %}
+                <code>(unavailable, set name first)</code>
+                {% endif %}
+                <p>Ping by sending email:</p>
+                <code>{{ check.email }}</code>
+
+                <p>You can also explicitly
+                    <a href="{% url 'hc-serve-doc' 'signaling_failures' %}">
+                        signal a failure</a>
+                    and
+                    <a href="{% url 'hc-serve-doc' 'measuring_script_run_time' %}">
+                        measure job execution time</a>.
+                </p>
+            </div>
+            <div class="text-right">
+                {% if rw %}
+                <button
+                    data-toggle="modal"
+                    data-target="#filtering-rules-modal"
+                    class="btn btn-sm btn-default">Filtering Rules&hellip;</button>
+                {% endif %}
+                {% if check.url %}
+                <button
+                    data-toggle="modal"
+                    data-target="#show-usage-modal"
+                    class="btn btn-sm btn-default">Usage Examples</button>
+                <button
+                    data-label="Copy URL"
+                    data-clipboard-text="{{ check.url }}"
+                    class="btn btn-sm btn-default copy-btn">Copy URL</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="details-block">
+            <h2>Current Status</h2>
+            <div id="current-status-indicator">
+                <span id="current-status-icon" class="status ic-{{ check.get_status }}"></span>
+                <div id="current-status-spinner" class="spinner {% if check.last_start %}started{% endif %}"></div>
+            </div>
+            <div id="current-status-content">
+                <p id="current-status-text">{% include "front/log_status_text.html" %}</p>
+                {% include "front/details_downtimes.html" %}
+            </div>
+            <div class="text-right">
+                {% if rw %}
+                <form action="{% url 'hc-pause' check.code %}" method="post">
+                    {% csrf_token %}
+                    <input
+                        id="pause-btn"
+                        type="submit"
+                        {% if check.status == "paused" %}disabled{% endif %}
+                        class="btn btn-sm btn-default" value="Pause" />
+                </form>
+                {% endif %}
+
+                {% if check.url %}
+                {% if project.show_slugs and not project.ping_key %}
+                    {% if rw %}
+                    <button
+                        data-toggle="modal"
+                        data-target="#no-ping-key-modal"
+                        class="btn btn-sm btn-default">Ping Now!</button>
+                    {% endif %}
+                {% else %}
+                <button
+                    id="ping-now"
+                    data-url="{{ check.url }}"
+                    class="btn btn-sm btn-default">Ping Now!</button>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="details-block">
+            <h2>Schedule</h2>
+            <table id="details-schedule">
+                <tr>
+                    {% if check.kind == "simple" %}
+                    <th>Period</th>
+                    <td>
+                        <span class="value">{{ check.timeout|hc_duration }}</span>
+                        <div class="subtitle">
+                            (The expected time between pings)
+                        </div>
+                    </td>
+                    {% elif check.kind == "cron" %}
+                    <th>Cron Expression</th>
+                    <td>
+                        <span class="value">{{ check.schedule }}</span>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% if check.kind == "cron" %}
+                <tr>
+                    <th>Time Zone</th>
+                    <td>
+                        <span class="value">{{ check.tz }}</span>
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Grace Time</th>
+                    <td>
+                        <span class="value">{{ check.grace|hc_duration }}</span>
+                        <div class="subtitle">
+                            (When a check is late, how long to wait to send an alert)
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            {% if rw %}
+            <div class="text-right rw">
+                <button
+                    id="edit-timeout"
+                    class="btn btn-sm btn-default timeout-grace"
+                    data-code="{{ check.code }}"
+                    data-status-url="{% url 'hc-status-single' check.code %}"
+                    data-kind="{{ check.kind }}"
+                    data-timeout="{{ check.timeout.total_seconds|floatformat:'0' }}"
+                    data-grace="{{ check.grace.total_seconds|floatformat:'0' }}"
+                    data-schedule="{{ check.schedule }}"
+                    data-tz="{{ check.tz }}">
+                    Change Schedule&hellip;</button>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="details-block">
+            <h2>Notification Methods</h2>
+            {% if channels %}
+            <table id="details-integrations" class="table {% if rw %}rw{% endif %}">
+            {% for channel in channels %}
+                <tr data-url="{% url 'hc-switch-channel' check.code channel.code %}" {% if channel in enabled_channels %}class="on"{% endif %}>
+                    <th>
+                        <span class="label">
+                            {% if channel in enabled_channels %}ON{% else %}OFF{% endif %}
+                        </span>
+                    </th>
+                    <td>
+                        <span class="ic-{{ channel.kind }}"></span>
+                        {{ channel }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+            {% else %}
+            <div class="alert no-channels">
+                No notification methods set up yet.
+                <br />
+                Set up your preferred methods of notification in the
+                <a href="{% url 'hc-channels' project.code %}">Integrations</a>
+                page.
+            </div>
+            {% endif %}
+        </div>
+
+        {% if rw %}
+        <div class="details-block">
+            <h2>Danger Zone</h2>
+            <p>Copy, transfer, or permanently remove this check.</p>
+
+            <div class="text-right">
+                {% if project.num_checks_available > 0 %}
+                <button
+                    data-toggle="modal"
+                    data-target="#copy-modal"
+                    class="btn btn-sm btn-default">Create a Copy&hellip;</button>
+                {% endif %}
+                <button
+                    id="transfer-btn"
+                    data-toggle="modal"
+                    data-target="#transfer-modal"
+                    data-url="{% url 'hc-transfer' check.code %}"
+                    class="btn btn-sm btn-default">
+                    Transfer<span class="hidden-sm hidden-xs"> to Another Project</span>&hellip;
+                </button>
+                &nbsp;
+                <button
+                    data-toggle="modal"
+                    data-target="#clear-events-modal"
+                    class="btn btn-sm btn-remove">Clear Events</button>
+                <button
+                    data-toggle="modal"
+                    data-target="#remove-check-modal"
+                    class="btn btn-sm btn-remove">Remove</button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div id="events" class="col-sm-7" data-status-url="{% url 'hc-status-single' check.code %}">
+        <h2>
+            Events
+            <small class="hidden-xs">Click on individual items for details</small>
+            <div id="format-switcher" class="btn-group pull-right" data-toggle="buttons">
+                <label class="btn btn-default btn-xs" data-format="UTC">
+                    <input type="radio" name="date-format">
+                    UTC
+                </label>
+
+                {% if check.kind == "cron" and check.tz != "UTC" %}
+                <label class="btn btn-default btn-xs" data-format="{{ check.tz }}">
+                    <input type="radio" name="date-format">
+                    {{ check.tz }}
+                </label>
+                {% endif %}
+
+                <label class="btn btn-default btn-xs active" data-format="local">
+                    <input type="radio" name="date-format">
+                    Browser's time zone
+                </label>
+            </div>
+        </h2>
+
+        <div id="log-container"></div>
+
+    </div>
+</div>
+
+<div id="ping-details-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="ping-details-body">Loading</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Got It!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="transfer-modal" class="modal"></div>
+
+<form id="resume-form" action="{% url 'hc-resume' check.code %}" method="post">
+    {% csrf_token %}
+</form>
+
+
+{% include "front/update_name_modal.html" %}
+{% include "front/update_timeout_modal.html" %}
+{% include "front/show_usage_modal.html" %}
+{% include "front/remove_check_modal.html" %}
+{% include "front/clear_events_modal.html" %}
+{% include "front/filtering_rules_modal.html" %}
+{% include "front/copy_modal.html" %}
+
+{% if rw and project.show_slugs and not project.ping_key %}
+<div id="no-ping-key-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4>Ping Key Required</h4>
+            </div>
+            <div class="modal-body">
+                <p>This project does not yet have a ping key.<br />
+                   To ping this check, please generate the
+                   ping key first.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a href="{% url 'hc-project-settings' project.code %}" class="btn btn-primary">Open Project Settings</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script id="all-timezones" type="data">UTC,{{ timezones|join:"," }}</script>
+{% compress js %}
+<script src="{% static 'js/selectize.min.js' %}"></script>
+<script src="{% static 'js/nouislider.min.js' %}"></script>
+<script src="{% static 'js/snippet-copy.js' %}"></script>
+<script src="{% static 'js/moment.min.js' %}"></script>
+<script src="{% static 'js/moment-timezone-with-data-10-year-range.min.js' %}"></script>
+<script src="{% static 'js/purify.min.js' %}"></script>
+<script src="{% static 'js/update-timeout-modal.js' %}"></script>
+<script src="{% static 'js/adaptive-setinterval.js' %}"></script>
+<script src="{% static 'js/ping_details.js' %}"></script>
+<script src="{% static 'js/details.js' %}"></script>
+<script src="{% static 'js/initialize-timezone-selects.js' %}"></script>
+<script src="{% static 'js/slug-suggestions.js' %}"></script>
+{% endcompress %}
+{% endblock %}

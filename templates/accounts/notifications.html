@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% load compress hc_extras static tz %}
+
+{% block title %}Account Settings - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <h1 class="settings-title">
+            Settings
+            <small>{{ request.user.email }}</small>
+        </h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-3">
+        <ul class="nav nav-pills nav-stacked">
+            <li><a href="{% url 'hc-profile' %}">Account</a></li>
+            <li><a href="{% url 'hc-appearance' %}">Appearance</a></li>
+            {% if show_pricing %}
+            <li><a href="{% url 'hc-billing' %}">Billing</a></li>
+            {% endif %}
+            <li class="active"><a href="{% url 'hc-notifications' %}">Email Reports</a></li>
+        </ul>
+    </div>
+
+    <div class="col-sm-9 col-md-6">
+        <div class="panel panel-{{ status }}">
+            <div id="email-reports" class="panel-body settings-block">
+                <form method="post">
+                    {% csrf_token %}
+                    <h2>Email Reports</h2>
+
+                    <p>Periodic email reports:</p>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="reports"
+                            value="off"
+                            {% if profile.reports == "off" %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        Off
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="reports"
+                            value="weekly"
+                            {% if profile.reports == "weekly" %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        <strong>Weekly</strong> on Mondays
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="reports"
+                            value="monthly"
+                            {% if profile.reports == "monthly" %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        <strong>Monthly</strong> on 1st of every month
+                    </label>
+
+                    <br>
+                    <p>Ongoing reminders if any checks are down:</p>
+
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="nag_period"
+                            value="0"
+                            {% if profile.nag_period.total_seconds == 0 %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        Do not remind me
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="nag_period"
+                            value="86400"
+                            {% if profile.nag_period.total_seconds == 86400 %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        Remind me <strong>daily</strong>
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="nag_period"
+                            value="3600"
+                            {% if profile.nag_period.total_seconds == 3600 %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        Remind me <strong>hourly</strong>
+                    </label>
+
+                    <br />
+                    <p>Time zone:</p>
+                    <select id="tz" name="tz" class="form-control" value="{{ profile.tz }}">
+                        <option{% if profile.tz == "UTC" %} selected{% endif %}>UTC</option>
+                        {% for tz in timezones %}
+                        <option{% if profile.tz == tz %} selected{% endif %}>{{ tz }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <br />
+                    <p class="text-muted">
+                        {% site_name %} will send reports to
+                        <strong>{{ profile.user.email }}</strong>,
+                        between 9:00 and 11:00 in your selected time zone.
+                    </p>
+                    {% if profile.next_report_date %}
+                    <p class="text-muted">
+                        {% timezone profile.tz %}
+                            Next {{ profile.reports }} report date is
+                            {{ profile.next_report_date|date:"F j, Y" }}.
+                        {% endtimezone 0%}
+                    </p>
+                    {% endif %}
+                    <br />
+                    <button
+                        type="submit"
+                        class="btn btn-default pull-right">Save Changes</button>
+                </form>
+            </div>
+            {% if status == "info" %}
+            <div class="panel-footer">
+                Your settings have been updated!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/selectize.min.js' %}"></script>
+<script src="{% static 'js/notifications.js' %}"></script>
+{% endcompress %}
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load compress static hc_extras %}
+
+{% block title %}{{ site_name }}{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <h1 class="settings-title">
+            My Projects
+        </h1>
+
+        <div id="project-selector" class="row">
+            {% for project in projects %}
+            <a href="{% url 'hc-checks' project.code %}">
+                <div id="{{ project.code }}" class="col-sm-6 col-md-4">
+                    <div class="panel project {% if project.id == last_project_id %}selected{% endif %}">
+                        <div class="indicators">
+                            <div class="status ic-{{ project.overall_status }}"></div>
+                            <div class="spinner {% if project.any_started %}started{% endif %}"></div>
+                        </div>
+                        <h4>{{ project }}</h4>
+                        <div>
+                            {{ project.n_checks }} check{{ project.n_checks|pluralize }},
+                            {{ project.n_channels }} integration{{ project.n_channels|pluralize }}
+                        </div>
+                        <div class="text-muted">
+                            {{ project.owner_email }}
+                        </div>
+
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+
+            <a id="add-project" href="#" data-toggle="modal" data-target="#add-project-modal">
+                <div class="col-sm-6 col-md-4">
+                    <div class="panel project">
+                        New Project&hellip;
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+</div>
+
+{% include "accounts/add_project_modal.html" %}
+
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/adaptive-setinterval.js' %}"></script>
+<script src="{% static 'js/add_project_modal.js' %}"></script>
+<script src="{% static 'js/projects.js' %}"></script>
+{% endcompress %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "emails/base.html" %}
+{% load hc_extras %}
+
+{% block content %}
+Hello,
+<br />
+
+{% if membership %}
+    {% if membership.project.name %}
+        <strong>{{ membership.project.owner.email }}</strong> invites you to their
+        <a href="{% site_root %}">{% site_name %}</a>
+        project <strong>{{ membership.project }}</strong>.
+    {% else %}
+        <strong>{{ membership.project.owner.email }}</strong> invites you to their
+        <a href="{% site_root %}">{% site_name %}</a> account.
+    {% endif %}
+    <br /><br />
+
+    {% if membership.role == "r" %}
+    You will be able to view their existing monitoring checks, but not modify them.
+    {% else %}
+    You will be able to manage their existing monitoring checks and set up new ones.
+    {% endif %}
+    If you already have your own account on {% site_name %}, you will be able to switch
+    between the two accounts.
+    <br /><br />
+{% endif %}
+
+To log into <a href="{% site_root %}">{% site_name %}</a>,
+please press the button below:
+{% endblock %}
+
+
+{% block content_more %}
+Thanks,<br>
+The {% site_name %} Team
+<br /><br />
+
+<strong>P.S.</strong> Need help getting started? Check out our
+<a href="{% site_root %}{% url 'hc-docs' %}">help documentation</a>.
+Or, just reply to this email with any questions or issues you have.
+{% endblock %}

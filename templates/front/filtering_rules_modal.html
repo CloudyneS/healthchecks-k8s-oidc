@@ -1,0 +1,152 @@
+{% load hc_extras %}
+
+<div id="filtering-rules-modal" class="modal">
+    <div class="modal-dialog">
+        <form
+            action="{% url 'hc-filtering-rules' check.code %}"
+            class="form-horizontal"
+            method="post">
+            {% csrf_token %}
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h2>HTTP Requests</h2>
+                    <p>Allowed request methods for HTTP requests:</p>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="methods"
+                            value=""
+                            {% if check.methods == "" %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        HEAD, GET, POST, PUT
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="methods"
+                            value="POST"
+                            {% if check.methods == "POST" %} checked {% endif %}>
+                        <span class="radiomark"></span>
+                        Only POST
+                        <span class="help-block">
+                            If set, {{ site_name }} will ignore HTTP requests
+                            using any other request method.
+                        </span>
+                    </label>
+                </div>
+
+                <hr>
+
+                <div class="modal-body">
+                    <h2>Inbound Emails</h2>
+                    <label class="checkbox-container">
+                        <input
+                            type="checkbox"
+                            class="filter-toggle"
+                            name="filter_subject"
+                            {% if check.filter_subject %}checked{% endif %} />
+                        <span class="checkmark"></span>
+                        Filter by keywords in the Subject line
+                    </label>
+
+                    <label class="checkbox-container">
+                        <input
+                            type="checkbox"
+                            class="filter-toggle"
+                            name="filter_body"
+                            {% if check.filter_body %}checked{% endif %} />
+                        <span class="checkmark"></span>
+                        Filter by keywords in the message body
+                    </label>
+
+                    <div class="form-group">
+                        <label for="start_kw" class="col-sm-4 control-label">
+                            Start Keywords
+                        </label>
+                        <div class="col-sm-7">
+                            <input
+                                id="start_kw"
+                                name="start_kw"
+                                type="text"
+                                maxlength="200"
+                                value="{{ check.start_kw }}"
+                                {% if not check.filter_subject and not check.filter_body %}disabled{% endif %}
+                                class="form-control filter-kw" />
+                            <span class="help-block">
+                                Comma-separated list of keywords. If subject or body
+                                contains any of the keywords, classify the email as "start".
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="success_kw" class="col-sm-4 control-label">
+                            Success Keywords
+                        </label>
+                        <div class="col-sm-7">
+                            <input
+                                id="success_kw"
+                                name="success_kw"
+                                type="text"
+                                maxlength="200"
+                                value="{{ check.success_kw }}"
+                                {% if not check.filter_subject and not check.filter_body %}disabled{% endif %}
+                                class="form-control filter-kw" />
+                            <span class="help-block">
+                                Comma-separated list of keywords. If subject or body
+                                contains any of the keywords, classify the email as "success".
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="failure_kw" class="col-sm-4 control-label">
+                            Failure Keywords
+                        </label>
+                        <div class="col-sm-7">
+                            <input
+                                id="failure_kw"
+                                name="failure_kw"
+                                type="text"
+                                maxlength="200"
+                                value="{{ check.failure_kw }}"
+                                {% if not check.filter_subject and not check.filter_body %}disabled{% endif %}
+                                class="form-control filter-kw" />
+                            <span class="help-block">
+                                Comma-separated list of keywords. If subject or body
+                                contains any of the keywords, classify the email as "failure".
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="modal-body">
+                    <h2>Pinging a Paused Check</h2>
+                    <p>When a paused check receives a ping:</p>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="manual_resume"
+                            value=""
+                            {% if not check.manual_resume %}checked{% endif %}>
+                        <span class="radiomark"></span>
+                        Leave the paused state (default)
+                    </label>
+                    <label class="radio-container">
+                        <input
+                            type="radio"
+                            name="manual_resume"
+                            value="1"
+                            {% if check.manual_resume %}checked{% endif %}>
+                        <span class="radiomark"></span>
+                        Ignore the ping, stay in the paused state
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

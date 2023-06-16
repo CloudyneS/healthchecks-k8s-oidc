@@ -1,0 +1,82 @@
+.page-docs-cron h1 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.page-docs-cron h2 {
+    margin-top: 40px;
+    font-weight: bold;
+}
+
+.cron-example th {
+    background: var(--cheatsheet-example-bg);
+}
+
+.cron-example th div {
+    padding: 5px;
+    margin: 5px;
+    font-family: monospace;
+    min-width: 28px;
+    text-align: center;
+}
+
+.cron-example td {
+    position: relative;
+    padding: 8px;
+}
+
+.cron-example .guide {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    bottom: 15px;
+    width: 40%;
+
+    border-left: 2px dotted var(--cheatsheet-dotted-color);
+    border-bottom: 2px dotted var(--cheatsheet-dotted-color);
+}
+
+.desc {
+    text-align: center;
+    font-weight: bold;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--text-color);
+    padding: 8px;
+    margin-bottom: 8px;
+}
+
+#cron-examples {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#cron-examples .panel {
+    width: 450px;
+    margin-right: 20px;
+}
+
+.cron-example td.minor {
+    color: var(--text-muted);
+}
+
+.page-docs-cron #test-area {
+    max-width: 920px;
+}
+
+.page-docs-cron #cron-preview {
+    margin-top: 20px;
+}
+
+#common-cron-expressions td {
+    vertical-align: middle;
+}
+
+#common-cron-expressions td:nth-child(2) {
+    font-family: monospace;
+}
+
+#common-cron-expressions td:last-child {
+    text-align: right;
+}

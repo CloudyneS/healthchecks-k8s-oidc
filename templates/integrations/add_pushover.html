@@ -1,0 +1,94 @@
+{% extends "base_project.html" %}
+{% load compress humanize static hc_extras %}
+
+{% block title %}Pushover Integration for {{ site_name }}{% endblock %}
+
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+    <h1>Pushover</h1>
+    <div class="jumbotron">
+        <p>
+            <a href="https://www.pushover.net/">Pushover</a> delivers
+            real-time notifications on your Android, iPhone, iPad, Desktop,
+            Android Wear and Apple Watch. You can set up {{ site_name }} to
+            receive Pushover notifications in a few simple steps.
+        </p>
+    </div>
+
+    <h2>Integration Settings</h2>
+
+    <form id="add-pushover" method="post" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Priority for "down" events</label>
+            <div class="col-sm-8">
+                <select name="po_priority" class="form-control">
+                    <option value="-3">
+                        Disabled: Does not notify about Down events.
+                    </option>
+                    <option value="-2">
+                        Lowest Priority: Generates no notification on your device.
+                    </option>
+                    <option value="-1">
+                        Low Priority: Sends a quiet notification.
+                    </option>
+                    <option value="0" selected="selected">
+                        Normal Priority:
+                    </option>
+                    <option value="1">
+                        High Priority: Bypasses user's quiet hours.
+                    </option>
+                    <option value="2">
+                        Emergency Priority: Repeated every {{po_retry_delay|hc_duration }} for at most {{ po_expiration|hc_duration }} until you acknowledge them.
+                    </option>
+                </select>
+           </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Priority for "up" events</label>
+            <div class="col-sm-8">
+                <select name="po_priority_up" class="form-control">
+                    <option value="-3">
+                        Disabled: Does not notify about Up events.
+                    </option>
+                    <option value="-2">
+                        Lowest priority: Generates no notification on your device.
+                    </option>
+                    <option value="-1">
+                        Low priority: Sends a quiet notification.
+                    </option>
+                    <option value="0" selected="selected">
+                        Normal priority:
+                    </option>
+                    <option value="1">
+                        High priority: Bypasses user's quiet hours.
+                    </option>
+                    <option value="2">
+                        Emergency priority: Repeated every {{po_retry_delay|hc_duration }} for at most {{ po_expiration|hc_duration }} until you acknowledge them.
+                    </option>
+                </select>
+           </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-8">
+                <button type="submit" class="btn btn-default">
+                    <img class="ai-icon" src="{% static 'img/integrations/po.png' %}" alt="Pushover" />
+                    Subscribe with Pushover
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/selectize.min.js' %}"></script>
+<script src="{% static 'js/add_pushover.js' %}"></script>
+{% endcompress %}
+{% endblock %}

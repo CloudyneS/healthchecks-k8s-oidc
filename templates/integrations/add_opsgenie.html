@@ -1,0 +1,138 @@
+{% extends "base_project.html" %}
+{% load humanize static hc_extras %}
+
+{% block title %}Opsgenie Integration for {{ site_name }}{% endblock %}
+
+
+{% block content %}
+<div class="row">
+<div class="col-sm-12">
+    <h1>Opsgenie</h1>
+
+    <p><a href="https://www.opsgenie.com/">Opsgenie</a> provides
+    alerting, on-call scheduling, escalation policies, and incident tracking.
+    You can integrate it with your {{ site_name }} account in a few
+    simple steps.</p>
+
+    <h2>Setup Guide</h2>
+    <div class="row ai-step">
+        <div class="col-sm-6">
+            <span class="step-no"></span>
+            <p>
+                Log into your Opsgenie account,
+                select a team, and go to the team's
+                <strong>Integrations › Add integration</strong> page.
+            </p>
+        </div>
+        <div class="col-sm-6">
+            <img
+                class="ai-guide-screenshot"
+                alt="Screenshot"
+                src="{% static 'img/integrations/setup_opsgenie_1.png' %}">
+        </div>
+    </div>
+    <div class="row ai-step">
+        <div class="col-sm-6">
+            <span class="step-no"></span>
+            Select <strong>API</strong> in the grid of offered integration types.
+        </div>
+        <div class="col-sm-6">
+            <img
+                class="ai-guide-screenshot"
+                alt="Screenshot"
+                src="{% static 'img/integrations/setup_opsgenie_2.png' %}">
+        </div>
+    </div>
+    <div class="row ai-step">
+        <div class="col-sm-6">
+            <span class="step-no"></span>
+            <p>The integration needs a <strong>Create and Update Access</strong>
+                permission, make sure it is <strong>checked</strong>.
+            </p>
+            <p>
+                The integration does not need the <strong>Read Access</strong> and
+                <strong>Delete Access</strong> checkboxes – make sure they are
+                <strong>unchecked</strong>.
+            </p>
+            <p>Give the integration a descriptive name,
+                take note of its <strong>API Key</strong>, then save the integration.
+            </p>
+        </div>
+        <div class="col-sm-6">
+            <img
+                class="ai-guide-screenshot"
+                alt="Screenshot"
+                src="{% static 'img/integrations/setup_opsgenie_3.png' %}">
+        </div>
+    </div>
+
+    <div class="row ai-step">
+        <div class="col-sm-6">
+            <span class="step-no"></span>
+            <p>Paste the API Key down below, and make sure the correct
+                <strong>service region</strong> is selected.
+                Save the integration, and you are done!
+            </p>
+        </div>
+    </div>
+
+    <h2>Integration Settings</h2>
+
+    <form method="post" class="form-horizontal">
+        {% csrf_token %}
+        <div class="form-group {{ form.key.css_classes }}">
+            <label for="api-key" class="col-sm-2 control-label">API Key</label>
+            <div class="col-sm-4">
+                <input
+                    id="api-key"
+                    type="text"
+                    class="form-control"
+                    name="key"
+                    placeholder=""
+                    value="{{ form.key.value|default:"" }}">
+
+                {% if form.key.errors %}
+                <div class="help-block">
+                    {{ form.key.errors|join:"" }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group {{ form.region.css_classes }}">
+            <label for="api-key" class="col-sm-2 control-label">Region</label>
+            <div class="col-sm-4">
+                <label class="radio-container">
+                    <input
+                        type="radio"
+                        name="region"
+                        value="us"
+                        {% if form.region.value == "us" %} checked {% endif %}>
+                    <span class="radiomark"></span>
+                    US (default)
+                </label>
+                <label class="radio-container">
+                    <input
+                        type="radio"
+                        name="region"
+                        value="eu"
+                        {% if form.region.value == "eu" %} checked {% endif %}>
+                    <span class="radiomark"></span>
+                    EU
+                </label>
+
+                {% if form.region.errors %}
+                <div class="help-block">
+                    {{ form.region.errors|join:"" }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary">Save Integration</button>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+<div id="signup-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="title">Create Your Account</div>
+
+                <label for="signup-email">
+                    Enter your <strong>email address</strong>.
+                </label>
+                <input
+                    type="email"
+                    class="form-control input-lg"
+                    id="signup-email"
+                    value="{{ magic_form.email.value|default:"" }}"
+                    placeholder="you@example.org"
+                    autocomplete="off">
+
+                <p id="link-instruction">
+                    We will email you a magic sign in link.
+                </p>
+
+                <button id="signup-go" class="btn btn-lg btn-primary btn-block">
+                    Email Me a Link
+                </button>
+
+                <div id="signup-result"></div>
+            </div>
+        </div>
+    </div>
+</div>

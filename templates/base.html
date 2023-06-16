@@ -1,0 +1,237 @@
+<!DOCTYPE html>{% load compress static hc_extras %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{{ site_name }} - Monitor Cron Jobs. Get Notified When Your Cron Jobs Fail{% endblock %}</title>
+    {% block description %}
+    <meta name="description" content="Monitor and Get Notified When Your Cron Jobs Fail. Free alternative to Cronitor and Dead Man's Snitch.">
+    {% endblock %}
+    {% block keywords %}
+    <meta name="keywords" content="healthchecks, monitor cron jobs, cron monitoring, cron job syntax, health checks, crontab cheat sheet, crontab monitoring, cronjob monitoring, cron dashboard">
+    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-title" content="{{ site_name }}">
+    <meta name="application-name" content="{{ site_name }}">
+    {% if request.user.is_authenticated and request.profile.theme == 'dark' %}
+    <meta name="theme-color" content="#18181b">
+    {% endif %}
+    <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-180.png' %}">
+    {% block head %}{% endblock %}
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/selectize.hc.css' %}" type="text/css">
+
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-colors.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}" type="text/css">
+
+    <link rel="stylesheet" href="{% static 'css/add_credential.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/add_project_modal.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/appearance.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/webhook_form.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/badges.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/billing.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/channel_checks.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/channels.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/checkbox.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/details.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/docs.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/docs_cron.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/icomoon.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/log.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/my_checks.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/my_checks_desktop.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/nouislider.min.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/nouislider.hc.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/nouislider.dark.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/ping_details.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/pricing.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/projects.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/radio.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/search.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/settings.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/snippet-copy.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/syntax.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/set_password.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/signal_form.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/project.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/signup.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/slug-suggestions.css' %}" type="text/css">
+    {% endcompress %}
+</head>
+<body class="page-{{ page }}{% if request.user.is_authenticated and request.profile.theme == 'dark' %} dark{% endif%}">
+    {% debug_warning %}
+    {% if request.user.is_authenticated and request.profile.deletion_scheduled_date %}
+    <div id="account-warning">
+        Warning: Your account is scheduled for deletion.
+        <a href="mailto:{% support_email %}">Contact support</a> to resolve.
+    </div>
+    {% endif %}
+
+    <nav class="navbar navbar-default">
+        <div class="container{% if page == "checks" or page == "details" %}-fluid{% endif %}">
+        <div class="navbar-header">
+            <button
+                type="button"
+                class="navbar-toggle collapsed"
+                data-toggle="collapse"
+                data-target="#navbar"
+                aria-expanded="false"
+                aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            {% if request.user.is_authenticated and project %}
+            <div id="project-menu" class="navbar-brand">
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        {{ project }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a id="base-url" href="{% url 'hc-index' %}">All Projects</a></li>
+                        <li id="projects-divider" role="separator" class="divider"></li>
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a  href="#" data-toggle="modal"  data-target="#add-project-modal">New Project&hellip;</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            {% else %}
+            <a id="base-url" class="navbar-brand" href="{% url 'hc-index' %}">
+                <img
+                    id="logo"
+                    height="50"
+                    {% if site_logo_url %}
+                    src="{{ site_logo_url }}"
+                    {% else %}
+                    src="{% static 'img/logo.png' %}"
+                    {% endif %}
+                    alt="{{ site_name }}">
+            </a>
+            {% endif %}
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            {% if project %}
+            <ul id="nav-main-sections" class="nav navbar-nav">
+                <li {% if page == 'checks' %} class="active" {% endif %}>
+                    <a href="{% url 'hc-checks' project.code %}">Checks</a>
+                </li>
+
+                {% with b=project.have_channel_issues %}
+                <li {% if b %}id="broken-channels"{% endif %} {% if page == 'channels' %}class="active"{% endif %}>
+                    <a href="{% url 'hc-channels' project.code %}">
+                        Integrations
+                        {% if b %}<span class="ic-grace"></span>{% endif %}
+                    </a>
+                </li>
+                {% endwith %}
+
+                <li {% if page == 'badges' %} class="active" {% endif %}>
+                    <a href="{% url 'hc-badges' project.code %}">Badges</a>
+                </li>
+
+                <li {% if page == 'project' %} class="active" {% endif %}>
+                    <a href="{% url 'hc-project-settings' project.code %}">Settings</a>
+                </li>
+            </ul>
+            {% endif %}
+
+            <ul id="global-links" class="nav navbar-nav navbar-right">
+                {% if show_pricing %}
+                <li {% if page == 'pricing' %} class="active" {% endif %}>
+                    {% if project %}
+                    <a href="{% url 'hc-p-pricing' project.code %}">Pricing</a>
+                    {% else %}
+                    <a href="{% url 'hc-pricing' %}">Pricing</a>
+                    {% endif %}
+                </li>
+                {% endif %}
+
+                <li {% if page == 'docs' %} class="active" {% endif %}>
+                    <a href="{% url 'hc-docs' %}">Docs</a>
+                </li>
+
+                {% if request.user.is_authenticated %}
+                <li class="dropdown">
+                    <a id="nav-email" href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                        Account
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        {% if request.user.is_superuser %}
+                            <li><a href="{% url 'admin:index' %}">Site Administration</a></li>
+                            <li role="separator" class="divider"></li>
+                        {% endif %}
+
+                    <li class="dropdown-header">{{ request.user.email }}</li>
+
+                    <li>
+                        <a href="{% url 'hc-profile' %}">Account Settings</a>
+                    </li>
+                    <li>
+                        <form method="post" action="{% url 'hc-logout' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-link" type="submit">Log Out</button>
+                        </form>
+                    </li>
+                    </ul>
+                </li>
+                {% elif page != "login" %}
+                <li>
+                    <a href="{% url 'hc-login' %}">Sign In</a>
+                </li>
+                {% endif %}
+
+                {% if registration_open %}
+                {% if page == "welcome" or page == "login" %}
+                <li>
+                    <a id="nav-sign-up" href="#" data-toggle="modal" data-target="#signup-modal">
+                        <span>Sign Up</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+
+        </div>
+    </nav>
+
+    {% block containers %}
+    <div class="container{% if page == "checks" or page == "details" %}-fluid{% endif %}">
+        {% block content %}{% endblock %}
+    </div>
+    {% endblock %}
+
+    <footer class="footer">
+        <div class="container{% if page == "checks" or page == "details" %}-fluid{% endif %}">
+            <ul>
+                <li>
+                    Healthchecks {% site_version %}
+                    (<a href="https://github.com/healthchecks/healthchecks">github</a>,
+                     <a href="https://healthchecks.io">healthchecks.io</a>)
+                </li>
+            </ul>
+        </div>
+    </footer>
+
+    {% block base_modals %}{% endblock %}
+
+    {% block base_scripts %}
+    {% compress js %}
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    {% endcompress %}
+    {% endblock %}
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

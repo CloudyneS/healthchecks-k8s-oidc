@@ -1,0 +1,94 @@
+{% extends "base_project.html" %}
+{% load compress humanize static hc_extras %}
+
+{% block title %}Event Log - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-12">
+        <ol class="breadcrumb">
+            <li><a href="{% url 'hc-checks' check.project.code %}">{{ check.project }}</a></li>
+            <li>
+                <a href="{% url 'hc-details' check.code %}">{{ check.name_then_code }}</a>
+            </li>
+            <li class="active">Events</li>
+
+            <li id="format-switcher-container" class="pull-right hidden-xs">
+                <div id="format-switcher" class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-default btn-xs" data-format="UTC">
+                        <input type="radio" name="date-format" checked>
+                        UTC
+                    </label>
+
+                    {% if check.kind == "cron" and check.tz != "UTC" %}
+                    <label class="btn btn-default btn-xs" data-format="{{ check.tz }}">
+                        <input type="radio" name="date-format">
+                        {{ check.tz }}
+                    </label>
+                    {% endif %}
+
+                    <label class="btn btn-default btn-xs active" data-format="local">
+                        <input type="radio" name="date-format">
+                        Browser's time zone
+                    </label>
+                </div>
+            </li>
+        </ol>
+
+        <p>Filter events from <strong id="slider-from-formatted"></strong> to <strong id="slider-to-formatted"></strong>.</p>
+        <div
+            id="log-slider"
+            data-min="{{ min|timestamp }}"
+            data-max="{{ max|timestamp }}"
+            data-start="{{ start|timestamp }}"
+            data-end="{{ end|timestamp }}">
+        </div>
+
+        <form id="seek-form" method="get">
+            <input type="hidden" name="start" id="seek-start">
+            <input type="hidden" name="end" id="seek-end">
+        </form>
+
+        {% if num_total > 1000 %}
+        <p class="alert alert-info">Found {{ num_total }} ping events, displaying the most recent 1000.</p>
+        {% elif num_total > 0 %}
+        <p class="alert alert-info">Found {{ num_total }} ping event{{ num_total|pluralize }}.</p>
+        {% elif not events and check.n_pings > 0 %}
+        <div class="alert alert-info">The filter parameters matched no events.</div>
+        {% elif check.n_pings == 0 %}
+        <div class="alert alert-info">Log is empty. This check has not received any pings yet.</div>
+        {% endif %}
+
+        {% if events %}
+        <div class="table-responsive">
+        <table class="table" id="log" data-url="{% url 'hc-ping-details' check.code '0' %}">
+        {% for event in events %}{% include "front/log_row.html" with describe_body=True %}{% endfor %}
+        </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="ping-details-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="ping-details-body">Loading</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Got It!</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% compress js %}
+<script src="{% static 'js/nouislider.min.js' %}"></script>
+<script src="{% static 'js/moment.min.js' %}"></script>
+<script src="{% static 'js/moment-timezone-with-data-10-year-range.min.js' %}"></script>
+<script src="{% static 'js/purify.min.js' %}"></script>
+<script src="{% static 'js/ping_details.js' %}"></script>
+<script src="{% static 'js/log.js' %}"></script>
+{% endcompress %}
+{% endblock %}

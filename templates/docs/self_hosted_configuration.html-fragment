@@ -1,0 +1,622 @@
+<h1>Server Configuration</h1>
+<p>Healthchecks prepares its configuration in <code>hc/settings.py</code>. It reads configuration
+from environment variables. Below is a list of variables it reads and uses.</p>
+<ul class="self-hosted-configuration-toc">
+<li><a href="#ADMINS">ADMINS</a></li>
+<li><a href="#ALLOWED_HOSTS">ALLOWED_HOSTS</a></li>
+<li><a href="#APPRISE_ENABLED">APPRISE_ENABLED</a></li>
+<li><a href="#DB">DB</a></li>
+<li><a href="#DB_CONN_MAX_AGE">DB_CONN_MAX_AGE</a></li>
+<li><a href="#DB_HOST">DB_HOST</a></li>
+<li><a href="#DB_NAME">DB_NAME</a></li>
+<li><a href="#DB_PASSWORD">DB_PASSWORD</a></li>
+<li><a href="#DB_PORT">DB_PORT</a></li>
+<li><a href="#DB_SSLMODE">DB_SSLMODE</a></li>
+<li><a href="#DB_TARGET_SESSION_ATTRS">DB_TARGET_SESSION_ATTRS</a></li>
+<li><a href="#DB_USER">DB_USER</a></li>
+<li><a href="#DEBUG">DEBUG</a></li>
+<li><a href="#DEFAULT_FROM_EMAIL">DEFAULT_FROM_EMAIL</a></li>
+<li><a href="#DISCORD_CLIENT_ID">DISCORD_CLIENT_ID</a></li>
+<li><a href="#DISCORD_CLIENT_SECRET">DISCORD_CLIENT_SECRET</a></li>
+<li><a href="#EMAIL_HOST">EMAIL_HOST</a></li>
+<li><a href="#EMAIL_HOST_PASSWORD">EMAIL_HOST_PASSWORD</a></li>
+<li><a href="#EMAIL_HOST_USER">EMAIL_HOST_USER</a></li>
+<li><a href="#EMAIL_PORT">EMAIL_PORT</a></li>
+<li><a href="#EMAIL_USE_TLS">EMAIL_USE_TLS</a></li>
+<li><a href="#EMAIL_USE_SSL">EMAIL_USE_SSL</a></li>
+<li><a href="#EMAIL_USE_VERIFICATION">EMAIL_USE_VERIFICATION</a></li>
+<li><a href="#http_proxy">http_proxy and https_proxy</a></li>
+<li><a href="#INTEGRATIONS_ALLOW_PRIVATE_IPS">INTEGRATIONS_ALLOW_PRIVATE_IPS</a></li>
+<li><a href="#LINENOTIFY_CLIENT_ID">LINENOTIFY_CLIENT_ID</a></li>
+<li><a href="#LINENOTIFY_CLIENT_SECRET">LINENOTIFY_CLIENT_SECRET</a></li>
+<li><a href="#MASTER_BADGE_URL">MASTER_BADGE_LABEL</a></li>
+<li><a href="#MATRIX_ACCESS_TOKEN">MATRIX_ACCESS_TOKEN</a></li>
+<li><a href="#MATRIX_HOMESERVER">MATRIX_HOMESERVER</a></li>
+<li><a href="#MATRIX_USER_ID">MATRIX_USER_ID</a></li>
+<li><a href="#MATTERMOST_ENABLED">MATTERMOST_ENABLED</a></li>
+<li><a href="#MSTEAMS_ENABLED">MSTEAMS_ENABLED</a></li>
+<li><a href="#OPSGENIE_ENABLED">OPSGENIE_ENABLED</a></li>
+<li><a href="#PAGERTREE_ENABLED">PAGERTREE_ENABLED</a></li>
+<li><a href="#PD_APP_ID">PD_APP_ID</a></li>
+<li><a href="#PD_ENABLED">PD_ENABLED</a></li>
+<li><a href="#PING_BODY_LIMIT">PING_BODY_LIMIT</a></li>
+<li><a href="#PING_EMAIL_DOMAIN">PING_EMAIL_DOMAIN</a></li>
+<li><a href="#PING_ENDPOINT">PING_ENDPOINT</a></li>
+<li><a href="#PROMETHEUS_ENABLED">PROMETHEUS_ENABLED</a></li>
+<li><a href="#PUSHBULLET_CLIENT_ID">PUSHBULLET_CLIENT_ID</a></li>
+<li><a href="#PUSHBULLET_CLIENT_SECRET">PUSHBULLET_CLIENT_SECRET</a></li>
+<li><a href="#PUSHOVER_API_TOKEN">PUSHOVER_API_TOKEN</a></li>
+<li><a href="#PUSHOVER_EMERGENCY_EXPIRATION">PUSHOVER_EMERGENCY_EXPIRATION</a></li>
+<li><a href="#PUSHOVER_EMERGENCY_RETRY_DELAY">PUSHOVER_EMERGENCY_RETRY_DELAY</a></li>
+<li><a href="#PUSHOVER_SUBSCRIPTION_URL">PUSHOVER_SUBSCRIPTION_URL</a></li>
+<li><a href="#REGISTRATION_OPEN">REGISTRATION_OPEN</a></li>
+<li><a href="#REMOTE_USER_HEADER">REMOTE_USER_HEADER</a></li>
+<li><a href="#ROCKETCHAT_ENABLED">ROCKETCHAT_ENABLED</a></li>
+<li><a href="#RP_ID">RP_ID</a></li>
+<li><a href="#S3_ACCESS_KEY">S3_ACCESS_KEY</a></li>
+<li><a href="#S3_BUCKET">S3_BUCKET</a></li>
+<li><a href="#S3_ENDPOINT">S3_ENDPOINT</a></li>
+<li><a href="#S3_REGION">S3_REGION</a></li>
+<li><a href="#S3_SECRET_KEY">S3_SECRET_KEY</a></li>
+<li><a href="#S3_TIMEOUT">S3_TIMEOUT</a></li>
+<li><a href="#SECRET_KEY">SECRET_KEY</a></li>
+<li><a href="#SHELL_ENABLED">SHELL_ENABLED</a></li>
+<li><a href="#SIGNAL_CLI_SOCKET">SIGNAL_CLI_SOCKET</a></li>
+<li><a href="#SITE_LOGO_URL">SITE_LOGO_URL</a></li>
+<li><a href="#SITE_NAME">SITE_NAME</a></li>
+<li><a href="#SITE_ROOT">SITE_ROOT</a></li>
+<li><a href="#SLACK_CLIENT_ID">SLACK_CLIENT_ID</a></li>
+<li><a href="#SLACK_CLIENT_SECRET">SLACK_CLIENT_SECRET</a></li>
+<li><a href="#SLACK_ENABLED">SLACK_ENABLED</a></li>
+<li><a href="#SPIKE_ENABLED">SPIKE_ENABLED</a></li>
+<li><a href="#TELEGRAM_BOT_NAME">TELEGRAM_BOT_NAME</a></li>
+<li><a href="#TELEGRAM_TOKEN">TELEGRAM_TOKEN</a></li>
+<li><a href="#TRELLO_APP_KEY">TRELLO_APP_KEY</a></li>
+<li><a href="#TWILIO_ACCOUNT">TWILIO_ACCOUNT</a></li>
+<li><a href="#TWILIO_AUTH">TWILIO_AUTH</a></li>
+<li><a href="#TWILIO_FROM">TWILIO_FROM</a></li>
+<li><a href="#TWILIO_MESSAGING_SERVICE_SID">TWILIO_MESSAGING_SERVICE_SID</a></li>
+<li><a href="#TWILIO_USE_WHATSAPP">TWILIO_USE_WHATSAPP</a></li>
+<li><a href="#USE_PAYMENTS">USE_PAYMENTS</a></li>
+<li><a href="#VICTOROPS_ENABLED">VICTOROPS_ENABLED</a></li>
+<li><a href="#WEBHOOKS_ENABLED">WEBHOOKS_ENABLED</a></li>
+<li><a href="#ZULIP_ENABLED">ZULIP_ENABLED</a></li>
+</ul>
+
+<h2 id="ADMINS"><code>ADMINS</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>A comma-sepparated list of email addresses to send code error notifications to.
+When <code>DEBUG=False</code>, Healthchecks will send the details of exceptions raised in the
+request/response cycle to the listed addresses. Example:</p>
+<div class="highlight"><pre><span></span><code><span class="na">ADMINS</span><span class="o">=</span><span class="s">alice@example.org,bob@example.org</span>
+</code></pre></div>
+
+<p>Note: for error notifications to work, make sure you have also specified working
+SMTP credentials in the <code>EMAIL_...</code> environment variables.</p>
+<h2 id="ALLOWED_HOSTS"><code>ALLOWED_HOSTS</code></h2>
+<p>Default: <code>*</code></p>
+<p>The host/domain names that this site can serve. You can specify multiple domain names
+by separating them with commas:</p>
+<div class="highlight"><pre><span></span><code><span class="na">ALLOWED_HOSTS</span><span class="o">=</span><span class="s">my-hc.example.org,alternative-name.example.org</span>
+</code></pre></div>
+
+<p>Apart from the comma-separated syntax, this is a standard Django setting.
+Read more about it in the
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#allowed-hosts">Django documentation</a>.</p>
+<h2 id="APPRISE_ENABLED"><code>APPRISE_ENABLED</code></h2>
+<p>Default: <code>False</code></p>
+<p>A boolean that turns on/off the <a href="https://github.com/caronc/apprise">Apprise</a>
+integration.</p>
+<p>Before enabling the Apprise integration, make sure the <code>apprise</code> package is installed:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>apprise
+</code></pre></div>
+
+<h2 id="DB"><code>DB</code></h2>
+<p>Default: <code>sqlite</code></p>
+<p>The database engine to use. Possible values: <code>sqlite</code>, <code>postgres</code>, <code>mysql</code>.</p>
+<h2 id="DB_CONN_MAX_AGE"><code>DB_CONN_MAX_AGE</code></h2>
+<p>Default: <code>0</code></p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#conn-max-age">Django documentation</a>.</p>
+<h2 id="DB_HOST"><code>DB_HOST</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#host">Django documentation</a>.</p>
+<h2 id="DB_NAME"><code>DB_NAME</code></h2>
+<p>Default: <code>hc</code> (PostgreSQL, MySQL) or <code>/path/to/projectdir/hc.sqlite</code> (SQLite)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#name">Django documentation</a>.</p>
+<h2 id="DB_PASSWORD"><code>DB_PASSWORD</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#password">Django documentation</a>.</p>
+<h2 id="DB_PORT"><code>DB_PORT</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#port">Django documentation</a>.</p>
+<h2 id="DB_SSLMODE"><code>DB_SSLMODE</code></h2>
+<p>Default: <code>prefer</code></p>
+<p>PostgreSQL-specific, <a href="https://www.postgresql.org/docs/10/libpq-connect.html#LIBPQ-CONNECT-SSLMODE">details</a></p>
+<h2 id="DB_TARGET_SESSION_ATTRS"><code>DB_TARGET_SESSION_ATTRS</code></h2>
+<p>Default: <code>read-write</code></p>
+<p>PostgreSQL-specific, <a href="https://www.postgresql.org/docs/10/libpq-connect.html#LIBPQ-CONNECT-TARGET-SESSION-ATTRS">details</a></p>
+<h2 id="DB_USER"><code>DB_USER</code></h2>
+<p>Default: <code>postgres</code> (PostgreSQL) or <code>root</code> (MySQL)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#user">Django documentation</a>.</p>
+<h2 id="DEBUG"><code>DEBUG</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off debug mode.</p>
+<p><em>Never run a Healthchecks instance in production with the debug mode turned on!</em></p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#debug">Django documentation</a>.</p>
+<h2 id="DEFAULT_FROM_EMAIL"><code>DEFAULT_FROM_EMAIL</code></h2>
+<p>Default: <code>healthchecks@example.org</code></p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#default-from-email">Django documentation</a>.</p>
+<h2 id="DISCORD_CLIENT_ID"><code>DISCORD_CLIENT_ID</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Discord Client ID, required by the Discord integration.</p>
+<p>To set up the Discord integration:</p>
+<ul>
+<li>Register a new application at
+  <a href="https://discordapp.com/developers/applications/me">https://discordapp.com/developers/applications/me</a></li>
+<li>Add a Redirect URI to your Discord application. The URI format is
+  <code>SITE_ROOT/integrations/add_discord/</code>. For example, if <code>your SITE_ROOT</code>
+  is <code>https://my-hc.example.org</code> then the Redirect URI would be
+  <code>https://my-hc.example.org/integrations/add_discord/</code></li>
+<li>Look up your Discord app's <em>Client ID</em> and <em>Client Secret</em>. Put them
+  in the <code>DISCORD_CLIENT_ID</code> and <code>DISCORD_CLIENT_SECRET</code> environment
+  variables.</li>
+</ul>
+<h2 id="DISCORD_CLIENT_SECRET"><code>DISCORD_CLIENT_SECRET</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Discord Client Secret, required by the Discord integration. Look it up at
+<a href="https://discordapp.com/developers/applications/me">https://discordapp.com/developers/applications/me</a>.</p>
+<h2 id="EMAIL_HOST"><code>EMAIL_HOST</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#email-host">Django documentation</a>.</p>
+<h2 id="EMAIL_HOST_PASSWORD"><code>EMAIL_HOST_PASSWORD</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#email-host-password">Django documentation</a>.</p>
+<h2 id="EMAIL_HOST_USER"><code>EMAIL_HOST_USER</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#email-host-user">Django documentation</a>.</p>
+<h2 id="EMAIL_PORT"><code>EMAIL_PORT</code></h2>
+<p>Default: <code>587</code></p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#email-port">Django documentation</a>.</p>
+<h2 id="EMAIL_USE_TLS"><code>EMAIL_USE_TLS</code></h2>
+<p>Default: <code>True</code></p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#email-use-tls">Django documentation</a>.</p>
+<h2 id="EMAIL_USE_SSL"><code>EMAIL_USE_SSL</code></h2>
+<p>Default: <code>False</code></p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#email-use-ssl">Django documentation</a>.</p>
+<h2 id="EMAIL_USE_VERIFICATION"><code>EMAIL_USE_VERIFICATION</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off a verification step when adding an email integration.</p>
+<p>If enabled, whenever a user adds an email integration, Healthchecks emails a
+verification link to the new address. The new integration becomes active only
+after the user clicks the verification link.</p>
+<p>If you are setting up a private healthchecks instance where
+you trust your users, you can opt to disable the verification step. In that case,
+set <code>EMAIL_USE_VERIFICATION</code> to <code>False</code>.</p>
+<h2 id="http_proxy"><code>http_proxy</code> and <code>https_proxy</code></h2>
+<p>Default: <code>""</code> (empty string)</p>
+<p>Specifies the proxy server to use for outgoing HTTP and HTTPS requests.
+Supports different proxy server types. Examples:</p>
+<div class="highlight"><pre><span></span><code><span class="na">https_proxy</span><span class="o">=</span><span class="s">http://example.org:1234</span>
+<span class="na">https_proxy</span><span class="o">=</span><span class="s">https://example.org:1234</span>
+<span class="na">https_proxy</span><span class="o">=</span><span class="s">socks4://example.org:1234</span>
+<span class="na">https_proxy</span><span class="o">=</span><span class="s">socks5://example.org:1234</span>
+</code></pre></div>
+
+<p>Healthchecks uses libcurl as the HTTP client library for making HTTP(S) requests.
+For more information about the proxy functionality, please see
+<a href="https://curl.se/libcurl/c/CURLOPT_PROXY.html">libcurl documentation</a>.</p>
+<p>Note: If your proxy server has a private IP address, you will also need to
+set the <code>INTEGRATIONS_ALLOW_PRIVATE_IPS</code> setting to <code>True</code> to use it.</p>
+<h2 id="INTEGRATIONS_ALLOW_PRIVATE_IPS"><code>INTEGRATIONS_ALLOW_PRIVATE_IPS</code></h2>
+<p>Default: <code>False</code></p>
+<p>A boolean that controls whether the integrations are allowed to make
+HTTP(S) requests to private IP addresses (127.0.0.1, 192.168.x.x, ...). This setting
+is set to <code>False</code> by default, because allowing users to define webhooks that probe
+internal addresses is a security risk.</p>
+<p>Only enable this setting if you run your Healthchecks instance in a trusted
+environment, and need to integrate with services running in your internal network.</p>
+<p>This setting affects all integration types, not just webhooks. For example,
+if you run a Gotify instance on <code>localhost</code>, you will need to enable
+<code>INTEGRATIONS_ALLOW_PRIVATE_IPS</code> to be able to use it via the Gotify integration.</p>
+<p>This setting affects all outbound HTTP requests, including those made
+while setting up new integrations (e.g. during the OAuth2 authorization flow).</p>
+<p>This setting also affects connections to the proxy server when the <code>http_proxy</code> or
+<code>https_proxy</code> environment variables are set. If your proxy server has a private
+IP address, you will need to enable <code>INTEGRATIONS_ALLOW_PRIVATE_IPS</code> to use it.</p>
+<h2 id="LINENOTIFY_CLIENT_ID"><code>LINENOTIFY_CLIENT_ID</code></h2>
+<p>Default: <code>None</code></p>
+<h2 id="LINENOTIFY_CLIENT_SECRET"><code>LINENOTIFY_CLIENT_SECRET</code></h2>
+<p>Default: <code>None</code></p>
+<h2 id="MASTER_BADGE_URL"><code>MASTER_BADGE_LABEL</code></h2>
+<p>Default: same as <code>SITE_NAME</code></p>
+<p>The label for the "Overall Status" status badge.</p>
+<h2 id="MATRIX_ACCESS_TOKEN"><code>MATRIX_ACCESS_TOKEN</code></h2>
+<p>Default: <code>None</code></p>
+<p>The <a href="https://matrix.org/">Matrix</a> bot user's access token, required by the Matrix
+integration.</p>
+<p>To set up the Matrix integration:</p>
+<ul>
+<li>Register a bot user (for posting notifications) in your preferred Matrix homeserver.</li>
+<li>Use the <a href="https://www.matrix.org/docs/guides/client-server-api#login">Login API call</a>
+  to retrieve bot user's access token. You can run it as shown in the documentation,
+  using curl in the command shell.</li>
+<li>Set the <code>MATRIX_</code> environment variables. Example:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="na">MATRIX_ACCESS_TOKEN</span><span class="o">=</span><span class="s">[a long string of characters returned by the login call]</span>
+<span class="na">MATRIX_HOMESERVER</span><span class="o">=</span><span class="s">https://matrix.org</span>
+<span class="na">MATRIX_USER_ID</span><span class="o">=</span><span class="s">@mychecks:matrix.org</span>
+</code></pre></div>
+
+<h2 id="MATRIX_HOMESERVER"><code>MATRIX_HOMESERVER</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Matrix bot's homeserver address, required by the Matrix integration.</p>
+<h2 id="MATRIX_USER_ID"><code>MATRIX_USER_ID</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Matrix bot's user identifier, required by the Matrix integration.</p>
+<h2 id="MATTERMOST_ENABLED"><code>MATTERMOST_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Mattermost integration. Enabled by default.</p>
+<h2 id="MSTEAMS_ENABLED"><code>MSTEAMS_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the MS Teams integration. Enabled by default.</p>
+<h2 id="OPSGENIE_ENABLED"><code>OPSGENIE_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Opsgenie integration. Enabled by default.</p>
+<h2 id="PAGERTREE_ENABLED"><code>PAGERTREE_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the PagerTree integration. Enabled by default.</p>
+<h2 id="PD_APP_ID"><code>PD_APP_ID</code></h2>
+<p>Default: <code>None</code></p>
+<p>PagerDuty application ID. If set, enables the PagerDuty
+<a href="https://developer.pagerduty.com/docs/app-integration-development/events-integration/">Simple Install Flow</a>.
+If <code>None</code>, Healthchecks will fall back to the even simpler flow where users manually
+copy integration keys from PagerDuty and paste them in Healthchecks.</p>
+<p>To set up:</p>
+<ul>
+<li>Register a PagerDuty app at <a href="https://pagerduty.com/">PagerDuty</a> › Developer Mode › My Apps</li>
+<li>In the newly created app, add the "Events Integration" functionality</li>
+<li>Specify a Redirect URL: <code>https://your-domain.com/integrations/add_pagerduty/</code></li>
+<li>Copy the displayed app_id value (PXXXXX) and put it in the <code>PD_APP_ID</code> environment
+  variable</li>
+</ul>
+<h2 id="PD_ENABLED"><code>PD_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the PagerDuty integration. Enabled by default.</p>
+<h2 id="PING_BODY_LIMIT"><code>PING_BODY_LIMIT</code></h2>
+<p>Default: <code>10000</code></p>
+<p>The upper size limit in bytes for logged ping request bodies.
+The default value is 10000 (10 kilobytes). You can adjust the limit or you can remove
+it altogether by setting this value to <code>None</code>.</p>
+<h2 id="PING_EMAIL_DOMAIN"><code>PING_EMAIL_DOMAIN</code></h2>
+<p>Default: <code>localhost</code></p>
+<p>The domain to use for generating ping email addresses. Example:</p>
+<div class="highlight"><pre><span></span><code><span class="na">PING_EMAIL_DOMAIN</span><span class="o">=</span><span class="s">ping.my-hc.example.org</span>
+</code></pre></div>
+
+<p>In this example, Healthchecks would generate ping email addresses similar
+to <code>3f1a7317-8e96-437c-a17d-b0d550b51e86@ping.my-hc.example.org</code>.</p>
+<h2 id="PING_ENDPOINT"><code>PING_ENDPOINT</code></h2>
+<p>Default: <code>SITE_ROOT</code> + <code>/ping/</code></p>
+<p>The base URL to use for generating ping URLs. Example:</p>
+<div class="highlight"><pre><span></span><code><span class="na">PING_ENDPOINT</span><span class="o">=</span><span class="s">https://ping.my-hc.example.org</span>
+</code></pre></div>
+
+<p>In this example, Healthchecks would generate ping URLs similar
+to <code>https://ping.my-hc.example.org/3f1a7317-8e96-437c-a17d-b0d550b51e86</code>.</p>
+<h2 id="PROMETHEUS_ENABLED"><code>PROMETHEUS_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Prometheus integration. Enabled by default.</p>
+<h2 id="PUSHBULLET_CLIENT_ID"><code>PUSHBULLET_CLIENT_ID</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Pushbullet Client ID, required by the Pushbullet integration.</p>
+<p>To set up the Pushbullet integration:</p>
+<ul>
+<li>Add a new OAuth client at
+  <a href="https://www.pushbullet.com/#settings/clients">https://www.pushbullet.com/#settings/clients</a></li>
+<li>Add a <code>redirect_uri</code> to your OAuth client. The URI format is
+  <code>SITE_ROOT/integrations/add_pushbullet/</code>. For example, if <code>your SITE_ROOT</code>
+  is <code>https://my-hc.example.org</code> then the <code>redirect_uri</code> would be
+  <code>https://my-hc.example.org/integrations/add_pushbullet/</code></li>
+<li>Look up your OAuth client's <code>client_id</code> and <code>client_secret</code> values. Put them
+  in the <code>PUSHBULLET_CLIENT_ID</code> and <code>PUSHBULLET_CLIENT_SECRET</code> environment
+  variables.</li>
+</ul>
+<p>Read more about setting up a Pushbullet OAuth client in the
+<a href="https://docs.pushbullet.com/#oauth2">Pushbullet OAuth2 guide</a>.</p>
+<h2 id="PUSHBULLET_CLIENT_SECRET"><code>PUSHBULLET_CLIENT_SECRET</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Pushbullet Client Secret, required by the Pushbullet integration. Look it up at
+<a href="https://www.pushbullet.com/#settings/clients">https://www.pushbullet.com/#settings/clients</a>.</p>
+<h2 id="PUSHOVER_API_TOKEN"><code>PUSHOVER_API_TOKEN</code></h2>
+<p>Default: <code>None</code></p>
+<p>The <a href="https://pushover.net/">Pushover</a> API token, required by the Pushover integration.</p>
+<p>To enable the Pushover integration:</p>
+<ul>
+<li>Register a new Pushover application at
+  <a href="https://pushover.net/apps/build">https://pushover.net/apps/build</a>.</li>
+<li>Within the Pushover application configuration, enable subscriptions.
+  Make sure the subscription type is set to "URL". Also make sure the redirect
+  URL is configured to point back to the root of the Healthchecks instance
+  (e.g., <code>https://my-hc.example.org/</code>).</li>
+<li>Put the Pushover application's <em>API Token</em> and the <em>Subscription URL</em> in
+  <code>PUSHOVER_API_TOKEN</code> and <code>PUSHOVER_SUBSCRIPTION_URL</code> environment
+  variables. The Pushover subscription URL should look similar to
+  <code>https://pushover.net/subscribe/yourAppName-randomAlphaNumericData</code>.</li>
+</ul>
+<h2 id="PUSHOVER_EMERGENCY_EXPIRATION"><code>PUSHOVER_EMERGENCY_EXPIRATION</code></h2>
+<p>Default: <code>86400</code> (24 hours)</p>
+<p>Specifies how many seconds an emergency Pushover notification
+will continue to be retried for.</p>
+<p>More information in <a href="https://pushover.net/api#priority">Pushover API documentation</a>.</p>
+<h2 id="PUSHOVER_EMERGENCY_RETRY_DELAY"><code>PUSHOVER_EMERGENCY_RETRY_DELAY</code></h2>
+<p>Default: <code>300</code> (5 minutes)</p>
+<p>Specifies how often (in seconds) the Pushover servers will send the same notification
+to the user.</p>
+<p>More information in <a href="https://pushover.net/api#priority">Pushover API documentation</a>.</p>
+<h2 id="PUSHOVER_SUBSCRIPTION_URL"><code>PUSHOVER_SUBSCRIPTION_URL</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Pushover Subscription URL, required by the Pushover integration.</p>
+<h2 id="REGISTRATION_OPEN"><code>REGISTRATION_OPEN</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that controls whether site visitors can create new accounts.
+Set it to <code>False</code> if you are setting up a private Healthchecks instance, but
+it needs to be publicly accessible (so, for example, your cloud services
+can send pings to it).</p>
+<p>If you close new user registration, you can still selectively invite users
+to your team account.</p>
+<h2 id="REMOTE_USER_HEADER"><code>REMOTE_USER_HEADER</code></h2>
+<p>Default: <code>None</code></p>
+<p>Specifies the request header to use for external authentication. If you use
+a reverse proxy that handles user authentication, and the reverse proxy can pass
+the authenticated user's email address in an HTTP request header, you can use this
+setting to integrate Healthchecks with it.</p>
+<p>When <code>REMOTE_USER_HEADER</code> is set, Healthchecks will:</p>
+<ul>
+<li>in views that require authentication, look up the request header
+   specified in <code>REMOTE_USER_HEADER</code></li>
+<li>assume the header contains the user's email address</li>
+<li>automatically log in the user with a matching email address</li>
+<li>automatically create a user account if it does not exist</li>
+<li>disable the default authentication methods (login link to email, password)</li>
+</ul>
+<p>The header name in <code>REMOTE_USER_HEADER</code> must be specified in upper-case,
+ with any dashes replaced with underscores, and prefixed with <code>HTTP_</code>. For
+ example, if your authentication proxy sets a <code>X-Authenticated-User</code> request
+ header, you should set <code>REMOTE_USER_HEADER=HTTP_X_AUTHENTICATED_USER</code>.</p>
+<p><strong>Important:</strong> When this option is enabled, <strong>Healtchecks will trust the header's
+value implicitly</strong>, so it is <strong>very important</strong> to ensure that attackers cannot
+set the value themselves (and thus impersonate any user). How to do this varies by
+your chosen proxy, but generally involves configuring it to strip out headers that
+normalize to the same name as the chosen identity header.</p>
+<h2 id="ROCKETCHAT_ENABLED"><code>ROCKETCHAT_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Rocket.Chat integration. Enabled by default.</p>
+<h2 id="RP_ID"><code>RP_ID</code></h2>
+<p>Default: <code>None</code></p>
+<p>The <a href="https://www.w3.org/TR/webauthn-2/#relying-party-identifier">Relying Party identifier</a>,
+required by the WebAuthn second-factor authentication feature.</p>
+<p>Healthchecks optionally supports two-factor authentication using the WebAuthn
+standard. To enable WebAuthn support, set the <code>RP_ID</code> setting to a non-null value.
+Set its value to your site's domain without scheme and without port. For example,
+if your site runs on <code>https://my-hc.example.org</code>, set <code>RP_ID</code> to <code>my-hc.example.org</code>.</p>
+<p>Note that WebAuthn requires HTTPS, even if running on localhost. To test WebAuthn
+locally with a self-signed certificate, you can use the <code>runsslserver</code> command
+from the <code>django-sslserver</code> package.</p>
+<h2 id="S3_ACCESS_KEY"><code>S3_ACCESS_KEY</code></h2>
+<p>Default: <code>None</code></p>
+<p>Access key of an account in S3 service.</p>
+<p>Healthchecks can optionally upload ping request body data to S3-compatible object
+storage instead of storing it in the database. To use this feature, provide valid
+credentials to an S3-compatible service by setting the following environment variables:</p>
+<ul>
+<li><code>S3_ACCESS_KEY</code> (example: <code>AKIAFIXMEFIXME</code>)</li>
+<li><code>S3_BUCKET</code> (example: <code>my-bucket</code>)</li>
+<li><code>S3_ENDPOINT</code> (example: <code>s3.eu-central-1.amazonaws.com</code>)</li>
+<li><code>S3_REGION</code> (example: <code>eu-central-1</code>)</li>
+<li><code>S3_SECRET_KEY</code></li>
+</ul>
+<h2 id="S3_BUCKET"><code>S3_BUCKET</code></h2>
+<p>Default: <code>None</code></p>
+<p>Name of the bucket in S3 service for storing ping request body data.</p>
+<h2 id="S3_ENDPOINT"><code>S3_ENDPOINT</code></h2>
+<p>Default: <code>None</code></p>
+<p>URL to the S3-compatible service.</p>
+<h2 id="S3_REGION"><code>S3_REGION</code></h2>
+<p>Default: <code>None</code></p>
+<p>Region name of buckets in S3 service.</p>
+<h2 id="S3_SECRET_KEY"><code>S3_SECRET_KEY</code></h2>
+<p>Default: <code>None</code></p>
+<p>The secret key of an account in S3 service.</p>
+<h2 id="S3_TIMEOUT"><code>S3_TIMEOUT</code></h2>
+<p>Default: <code>60</code></p>
+<p>Timeout for individual S3 operations, in seconds.</p>
+<h2 id="SECRET_KEY"><code>SECRET_KEY</code></h2>
+<p>Default: <code>---</code></p>
+<p>A secret key used for cryptographic signing. Should be set to a unique,
+unpredictable value.</p>
+<p>This is a standard Django setting, read more in
+<a href="https://docs.djangoproject.com/en/4.2/ref/settings/#secret-key">Django documentation</a>.</p>
+<h2 id="SHELL_ENABLED"><code>SHELL_ENABLED</code></h2>
+<p>Default: <code>False</code></p>
+<p>A boolean that turns on/off the "Shell Commands" integration.</p>
+<p>The "Shell Commands" integration runs user-defined local shell commands when checks
+go up or down. This integration is disabled by default and can be enabled by setting
+the <code>SHELL_ENABLED</code> environment variable to <code>True</code>.</p>
+<p>Note: be careful when using "Shell Commands" integration, and only enable it when
+you fully trust the users of your Healthchecks instance. The commands will be executed
+by the <code>manage.py sendalerts</code> process and will run with its system permissions.</p>
+<h2 id="SIGNAL_CLI_SOCKET"><code>SIGNAL_CLI_SOCKET</code></h2>
+<p>Default: <code>None</code></p>
+<p>The path to the signal-cli UNIX socket, or the hostname:port of the signal-cli
+TCP socket.</p>
+<p>Example (UNIX socket):</p>
+<div class="highlight"><pre><span></span><code><span class="na">SIGNAL_CLI_SOCKET</span><span class="o">=</span><span class="s">/tmp/signal-cli.socket</span>
+</code></pre></div>
+
+<p>Example (TCP socket):</p>
+<div class="highlight"><pre><span></span><code><span class="na">SIGNAL_CLI_SOCKET</span><span class="o">=</span><span class="s">example.org:7583</span>
+</code></pre></div>
+
+<p>Healthchecks uses <a href="https://github.com/AsamK/signal-cli">signal-cli</a> to send Signal
+notifications. Healthcecks interacts with signal-cli over UNIX or TCP socket (requires
+signal-cli 0.10.0 or later).</p>
+<p>To enable the Signal integration:</p>
+<ul>
+<li>Set up and configure signal-cli to expose JSON RPC on an UNIX or TCP socket
+  (<a href="https://github.com/AsamK/signal-cli/wiki/JSON-RPC-service">instructions</a>).
+  Example: <code>signal-cli -a +xxxxxx daemon --socket /tmp/signal-cli-socket</code></li>
+<li>Put the socket's location in the <code>SIGNAL_CLI_SOCKET</code> environment variable.</li>
+</ul>
+<h2 id="SITE_LOGO_URL"><code>SITE_LOGO_URL</code></h2>
+<p>Default: <code>None</code></p>
+<p>An URL pointing to the image you want to use as the site logo. If not set,
+Healthchecks will use a fallback image: <code>/static/img/logo.png</code>.</p>
+<p>You can place a custom logo in <code>/static/img/</code>, run <code>manage.py collectstatic</code>, and
+point <code>SITE_LOGO_URL</code> to it like so:</p>
+<div class="highlight"><pre><span></span><code><span class="na">SITE_LOGO_URL</span><span class="o">=</span><span class="s">/static/img/my-custom-logo.png</span>
+</code></pre></div>
+
+<p>Or you can serve the logo from another server, and point to it using an absolute URL:</p>
+<div class="highlight"><pre><span></span><code><span class="na">SITE_LOGO_URL</span><span class="o">=</span><span class="s">https://example.org/cdn/my-custom-logo.png</span>
+</code></pre></div>
+
+<p>Either way, Healthchecks will use the provided <code>SITE_LOGO_URL</code> value as-is in HTML
+pages, and you should use an URL that <strong>the end user's browser will be able to
+access directly</strong>. The logo image can use any image format supported by browsers
+(PNG, SVG, JPG are all fine).</p>
+<p><strong>Docker note.</strong> You can build a custom Docker image with your logo "baked in". To
+do so, use a Dockerfile with the following contents, and with your logo.png placed next
+to it:</p>
+<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">healthchecks/healthchecks</span>
+<span class="k">COPY</span><span class="w"> </span>logo.png<span class="w"> </span>/opt/healthchecks/static-collected/img/
+</code></pre></div>
+
+<p>This overwrites the default placeholder logo, so, in this case, you do not need to
+specify <code>SITE_LOGO_URL</code>. Notice that the logo must be placed in <code>static-collected</code>, not
+<code>static</code>. This is because <code>manage.py collectstatic</code> has already been run in the base
+image's build time, and the web server will not recognize any new files placed in the
+<code>static</code> directory.</p>
+<p>Please do not use the Healthchecks.io logo (the one with the dark green background) on
+self-hosted instances. This logo is not part of the Healthchecks open-source project.</p>
+<h2 id="SITE_NAME"><code>SITE_NAME</code></h2>
+<p>Default: <code>Mychecks</code></p>
+<p>The display name of this Healthchecks instance. Healthchecks uses it throughout
+its web UI and documentation.</p>
+<h2 id="SITE_ROOT"><code>SITE_ROOT</code></h2>
+<p>Default: <code>http://localhost:8000</code></p>
+<p>The base URL of this Healthchecks instance. Healthchecks uses <code>SITE_ROOT</code> whenever
+it needs to construct absolute URLs.</p>
+<h2 id="SLACK_CLIENT_ID"><code>SLACK_CLIENT_ID</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Slack Client ID, used by the Slack integration.</p>
+<p>The Slack integration can work with or without the Slack Client ID. If
+the Slack Client ID is not set, in the "Integrations - Add Slack" page,
+Healthchecks will ask the user to provide a webhook URL for posting notifications.</p>
+<p>If the Slack Client <em>is</em> set, Healthchecks will use the OAuth2 flow
+to get the webhook URL from Slack. The OAuth2 flow is more user-friendly.
+To set it up, go to <a href="https://api.slack.com/apps/">https://api.slack.com/apps/</a>
+and create a <em>Slack app</em>. When setting up the Slack app, make sure to:</p>
+<ul>
+<li>Add the <a href="https://api.slack.com/scopes/incoming-webhook">incoming-webhook</a>
+  scope to the Bot Token Scopes.</li>
+<li>Add a <em>Redirect URL</em> in the format <code>SITE_ROOT/integrations/add_slack_btn/</code>.
+  For example, if your <code>SITE_ROOT</code> is <code>https://my-hc.example.org</code> then the
+  Redirect URL would be <code>https://my-hc.example.org/integrations/add_slack_btn/</code>.</li>
+</ul>
+<h2 id="SLACK_CLIENT_SECRET"><code>SLACK_CLIENT_SECRET</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Slack Client Secret. Required if <code>SLACK_CLIENT_ID</code> is set.
+Look it up at <a href="https://api.slack.com/apps/">https://api.slack.com/apps/</a>.</p>
+<h2 id="SLACK_ENABLED"><code>SLACK_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Slack integration. Enabled by default.</p>
+<h2 id="SPIKE_ENABLED"><code>SPIKE_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Spike.sh integration. Enabled by default.</p>
+<h2 id="TELEGRAM_BOT_NAME"><code>TELEGRAM_BOT_NAME</code></h2>
+<p>Default: <code>ExampleBot</code></p>
+<p>The <a href="https://telegram.org/">Telegram</a> bot name, required by the Telegram integration.</p>
+<p>To set up the Telegram integration:</p>
+<ul>
+<li>Create a Telegram bot by talking to the
+<a href="https://core.telegram.org/bots#6-botfather">BotFather</a>. Set the bot's name,
+description, user picture, and add a "/start" command.</li>
+<li>After creating the bot you will have the bot's name and token. Put them
+in <code>TELEGRAM_BOT_NAME</code> and <code>TELEGRAM_TOKEN</code> environment variables.</li>
+<li>Run the <code>settelegramwebhook</code> management command. This command tells Telegram
+where to forward channel messages by invoking Telegram's
+<a href="https://core.telegram.org/bots/api#setwebhook">setWebhook</a> API call:</li>
+</ul>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>./manage.py<span class="w"> </span>settelegramwebhook
+Done,<span class="w"> </span>Telegram<span class="err">&#39;</span>s<span class="w"> </span>webhook<span class="w"> </span><span class="nb">set</span><span class="w"> </span>to:<span class="w"> </span>https://my-monitoring-project.com/integrations/telegram/bot/
+</code></pre></div>
+
+<p>For this to work, your <code>SITE_ROOT</code> must be publicly accessible and use the "https://"
+scheme.</p>
+<h2 id="TELEGRAM_TOKEN"><code>TELEGRAM_TOKEN</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Telegram bot user's authentication token, required by the Telegram integration.</p>
+<h2 id="TRELLO_APP_KEY"><code>TRELLO_APP_KEY</code></h2>
+<p>Default: <code>None</code></p>
+<p>The <a href="https://trello.com/">Trello</a> app key, required by the Trello integration.</p>
+<p>To set up the Trello integration, get a developer API key from
+<a href="https://trello.com/app-key">https://trello.com/app-key</a> and put it in the
+<code>TRELLO_APP_KEY</code> environment variable.</p>
+<h2 id="TWILIO_ACCOUNT"><code>TWILIO_ACCOUNT</code></h2>
+<p>Default: <code>None</code></p>
+<p>Twilio Account SID, required by the SMS, Call, and WhatsApp integrations.</p>
+<h2 id="TWILIO_AUTH"><code>TWILIO_AUTH</code></h2>
+<p>Default: <code>None</code></p>
+<p>Twilio Auth token, required by the SMS, Call, and WhatsApp integrations.</p>
+<h2 id="TWILIO_FROM"><code>TWILIO_FROM</code></h2>
+<p>Default: <code>None</code></p>
+<p>The Twilio phone number to use as the sender for SMS and WhatsApp notifications,
+and as the caller for Call integrations.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="na">TWILIO_FROM</span><span class="o">=</span><span class="s">+15017122661</span>
+</code></pre></div>
+
+<h2 id="TWILIO_MESSAGING_SERVICE_SID"><code>TWILIO_MESSAGING_SERVICE_SID</code></h2>
+<p>Default: <code>None</code></p>
+<p>Optional, the Twilio Messaging Service SID for sending SMS and WhatsApp notifications.</p>
+<p>If <code>TWILIO_MESSAGING_SERVICE_SID</code> is specified, Healthchecks will include it in the
+"MessagingServiceSid" field when sending SMS and WhatsApp messages via Twilio API.
+This will result in Twilio using a Messaging Service instead of a plain sender number
+to deliver the SMS and WhatsApp messages.</p>
+<p>If <code>TWILIO_MESSAGING_SERVICE_SID</code> is not set, Healthchecks will fall back to using
+the "From" field with the value configured in <a href="#TWILIO_FROM">TWILIO_FROM</a> in API
+requests.</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="na">TWILIO_MESSAGING_SERVICE_SID</span><span class="o">=</span><span class="s">MGe56e622d540e6badc52ae0ac4af028c6</span>
+</code></pre></div>
+
+<h2 id="TWILIO_USE_WHATSAPP"><code>TWILIO_USE_WHATSAPP</code></h2>
+<p>Default: <code>False</code></p>
+<p>A boolean that turns on/off the WhatsApp integration.</p>
+<h2 id="USE_PAYMENTS"><code>USE_PAYMENTS</code></h2>
+<p>Default: <code>False</code></p>
+<p>A boolean that turns on/off billing features.</p>
+<h2 id="VICTOROPS_ENABLED"><code>VICTOROPS_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Splunk On-Call (VictorOps) integration.
+Enabled by default.</p>
+<h2 id="WEBHOOKS_ENABLED"><code>WEBHOOKS_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Webhooks integration. Enabled by default.</p>
+<h2 id="ZULIP_ENABLED"><code>ZULIP_ENABLED</code></h2>
+<p>Default: <code>True</code></p>
+<p>A boolean that turns on/off the Zulip integration. Enabled by default.</p>
