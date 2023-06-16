@@ -33,6 +33,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/cloudynes/healthchecks-proxyfix:latest
-            docker.io/cloudyne/healthchecks-proxyfix:latest
+            ghcr.io/cloudynes/healthchecks-proxyfix:v3-latest
+            docker.io/cloudyne/healthchecks-proxyfix:v3-latest
       
